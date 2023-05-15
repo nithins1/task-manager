@@ -19,3 +19,13 @@ CREATE TABLE "auth_user_tag_groups"(
     "record_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE ON UPDATE CASCADE  
 );
 success!
+timestamp: 2023-05-15T15:17:58.665455
+CREATE TABLE "tasks"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "name" CHAR(512),
+    "description" TEXT,
+    "user_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ,
+    "deadline" TIMESTAMP,
+    "completed" CHAR(1)
+);
+success!
