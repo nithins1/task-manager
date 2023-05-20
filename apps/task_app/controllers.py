@@ -48,3 +48,15 @@ def add():
         redirect(URL('index'))
 
     return dict(form=form)
+
+@action('edit/<id:int>', method=["GET", "POST"])
+@action.uses(db, session, auth.user, 'edit.html')
+def edit(id=None):
+    assert id is not None
+    p = db.tasks[id]
+    if p is None:
+        redirect(URL('index'))
+    form = Form(db.tasks, record=p, deletable=False, csrf_session=session, formstyle=FormStyleBulma)
+    if form.accepted:
+        redirect(URL('index'))
+    return dict(form=form)
