@@ -1,6 +1,6 @@
 [[extend 'layout.html']]
 
-<h2>Current tasks</h2>
+<h2 class="is-size-2">Current tasks</h2>
 <br>
 <a class="button is-success" href="[[=URL('add')]]">
     <span class="icon"><i class="fa fa-plus"></i></span>
@@ -12,21 +12,21 @@
         <tr>
             <th>Task Name</th>
             <th>Description</th>
-            <th>Deadline</th>
+            <th>Time Remaining</th>
             <th>Edit</th>
             <th>Mark Complete</th>
         </tr>
     </thead>
     [[for task in tasks:]]
     <tr>
-        <td>[[=task.name]]</td>
-        <td>[[=task.description]]</td>
-        <td>[[=task.deadline]]</td>
+        <td>[[=task['name'] ]]</td>
+        <td>[[=task['description'] ]]</td>
+        [[if task['overdue']: ]]<td class="has-text-danger">[[else: ]]<td class="has-text-success">[[pass]][[=task['timeleft'] ]]</td>
         <td>
-            <a href="[[=URL('edit',task.id)]]">Edit</a>
+            <a href="[[=URL('edit',task['id'])]]">Edit</a>
         </td>
         <td>
-        <a href="[[=URL('edit',task.id)]]">Complete</a>
+        <a href="[[=URL('edit',task['id'])]]">Complete</a>
         </td>
     </tr>
     [[pass]]

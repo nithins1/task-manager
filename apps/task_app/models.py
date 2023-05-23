@@ -2,8 +2,9 @@
 This file defines the database models
 """
 
-from .common import db, Field, auth
 from pydal.validators import *
+
+from .common import Field, auth, db
 
 ### Define your table below
 #

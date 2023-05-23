@@ -25,17 +25,26 @@ session, db, T, auth, and tempates are examples of Fixtures.
 Warning: Fixtures MUST be declared with @action.uses({fixtures}) else your app will result in undefined behavior
 """
 
-from py4web import action, request, abort, redirect, URL
-from yatl.helpers import A
-from .common import db, session, T, cache, auth, logger, authenticated, unauthenticated, flash
+import datetime
+
+from py4web import URL, action, redirect, request
 from py4web.utils.form import Form, FormStyleBulma
+from yatl.helpers import A
+
+from .common import (T, auth, authenticated, cache, db, flash, logger, session,
+                     unauthenticated)
 from .models import get_user_id
+
 
 @action("index")
 @action.uses("index.html", auth, db)
 def index():
     user_id = get_user_id()
-    rows = db(db.tasks.user_id == user_id).select()
+    rows = db(db.tasks.user_id == user_id).select().as_list()
+    for r in rows:
+        r['timeleft'] =  r['deadline'] - datetime.datetime.utcnow()
+        r['overdue'] = datetime.datetime.utcnow() > r['deadline']
+    print(rows)
     return dict(tasks=rows)
 
 @action("add", method=['GET', 'POST'])
