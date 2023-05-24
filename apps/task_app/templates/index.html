@@ -1,33 +1,64 @@
 [[extend 'layout.html']]
+<div class="columns">
+    <div class="column is-half">
+        <h2 class="is-size-2">Current Tasks</h2>
+        <br>
+        <a class="button is-success" href="[[=URL('add')]]">
+            <span class="icon"><i class="fa fa-plus"></i></span>
+            <span>Add</span>
+        </a>
+        <br>
+        <table class="table is-striped is-fullwidth">
+            <thead>
+                <tr>
+                    <th>Task Name</th>
+                    <th>Description</th>
+                    <th>Time Remaining</th>
+                    <th>Edit</th>
+                    <th>Mark Complete</th>
+                </tr>
+            </thead>
+            [[for task in uncompleted:]]
+            <tr>
+                <td>[[=task['name'] ]]</td>
+                <td>[[=task['description'] ]]</td>
+                [[if task['overdue']: ]]<td class="has-text-danger">[[else: ]]<td class="has-text-success">[[pass]][[=task['timeleft'] ]]</td>
+                <td>
+                    <a href="[[=URL('edit',task['id'])]]">Edit</a>
+                </td>
+                <td>
+                <a href="[[=URL('complete',task['id'])]]">Complete</a>
+                </td>
+            </tr>
+            [[pass]]
+        </table>
+    </div>
 
-<h2 class="is-size-2">Current tasks</h2>
-<br>
-<a class="button is-success" href="[[=URL('add')]]">
-    <span class="icon"><i class="fa fa-plus"></i></span>
-    <span>Add</span>
-</a>
-<br>
-<table class="table is-striped is-fullwidth">
-    <thead>
-        <tr>
-            <th>Task Name</th>
-            <th>Description</th>
-            <th>Time Remaining</th>
-            <th>Edit</th>
-            <th>Mark Complete</th>
-        </tr>
-    </thead>
-    [[for task in tasks:]]
-    <tr>
-        <td>[[=task['name'] ]]</td>
-        <td>[[=task['description'] ]]</td>
-        [[if task['overdue']: ]]<td class="has-text-danger">[[else: ]]<td class="has-text-success">[[pass]][[=task['timeleft'] ]]</td>
-        <td>
-            <a href="[[=URL('edit',task['id'])]]">Edit</a>
-        </td>
-        <td>
-        <a href="[[=URL('complete',task['id'])]]">Complete</a>
-        </td>
-    </tr>
-    [[pass]]
-</table>
+    <div class="column">
+        <h2 class="is-size-2">Completed Tasks</h2>
+        <br>
+        <table class="table is-striped is-fullwidth">
+            <thead>
+                <tr>
+                    <th>Task Name</th>
+                    <th>Description</th>
+                    <th>Edit</th>
+                    <th>Restore</th>
+                </tr>
+            </thead>
+            [[for task in completed:]]
+            <tr>
+                <td>[[=task['name'] ]]</td>
+                <td>[[=task['description'] ]]</td>
+                <td>
+                    <a href="[[=URL('edit',task['id'])]]">Edit</a>
+                </td>
+                <td>
+                    <a href="[[=URL('complete',task['id'])]]">Restore</a>
+                </td>
+            </tr>
+            [[pass]]
+        </table>
+    </div>
+</div>
+

@@ -40,12 +40,17 @@ from .models import get_user_id
 @action.uses("index.html", auth, db)
 def index():
     user_id = get_user_id()
-    rows = db((db.tasks.user_id == user_id) & (db.tasks.completed == False)).select().as_list()
-    for r in rows:
+
+    user_tasks = (db.tasks.user_id == user_id)
+    uncompleted_tasks = db(user_tasks & (db.tasks.completed == False)).select().as_list()
+    completed_tasks = db(user_tasks & (db.tasks.completed == True)).select().as_list()
+    
+    for r in uncompleted_tasks:
         r['timeleft'] =  r['deadline'] - datetime.datetime.utcnow()
         r['overdue'] = datetime.datetime.utcnow() > r['deadline']
-    print(rows)
-    return dict(tasks=rows)
+
+    return dict(completed=completed_tasks, uncompleted=uncompleted_tasks)
+
 
 @action("add", method=['GET', 'POST'])
 @action.uses("add.html", auth, db)
@@ -77,5 +82,6 @@ def inc(id=None):
 
     # Only allow update to occur if row's email matches current user
     if get_user_id() == t.user_id:
-        db(db.tasks.id == t.id).update(completed=True)
+        status = db(db.tasks.id == t.id).select()[0]
+        db(db.tasks.id == t.id).update(completed= not status.completed)
     redirect(URL('index'))
