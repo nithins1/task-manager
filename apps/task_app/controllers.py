@@ -40,7 +40,7 @@ from .models import get_user_id
 @action.uses("index.html", auth, db)
 def index():
     user_id = get_user_id()
-    rows = db(db.tasks.user_id == user_id).select().as_list()
+    rows = db((db.tasks.user_id == user_id) & (db.tasks.completed == False)).select().as_list()
     for r in rows:
         r['timeleft'] =  r['deadline'] - datetime.datetime.utcnow()
         r['overdue'] = datetime.datetime.utcnow() > r['deadline']
@@ -63,7 +63,7 @@ def add():
 def edit(id=None):
     assert id is not None
     p = db.tasks[id]
-    if p is None:
+    if p is None or p.user_id != get_user_id():
         redirect(URL('index'))
     form = Form(db.tasks, record=p, deletable=False, csrf_session=session, formstyle=FormStyleBulma)
     if form.accepted:
