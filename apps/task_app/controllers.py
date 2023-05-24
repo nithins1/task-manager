@@ -69,3 +69,13 @@ def edit(id=None):
     if form.accepted:
         redirect(URL('index'))
     return dict(form=form)
+
+@action("complete/<id:int>")
+@action.uses(db, auth)
+def inc(id=None):
+    t = db.tasks[id]
+
+    # Only allow update to occur if row's email matches current user
+    if get_user_id() == t.user_id:
+        db(db.tasks.id == t.id).update(completed=True)
+    redirect(URL('index'))
