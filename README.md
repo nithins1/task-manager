@@ -26,6 +26,8 @@ A user creates an account and is redirected to the index page, which has no task
 
 # Implementation Plan
 Sprint 1: Database setup, index page shows tasks, add page inserts new tasks, appropriate buttons on index page for marking tasks as complete and adding tasks
-Sprint 2: History page shows old tasks, index page has history button, history page has buttons for reactivating tasks
-Sprint 3: Stylistic cleanup, and implement images for tasks. Image files will be stored in Google Cloud Storage and the images table will have a row for each image and which task it is associated with. Index page shows images for each task.
+
+Sprint 2: Show old tasks, buttons for reactivating tasks
+
+Sprint 3: Stylistic cleanup. You can create tasks for other people (requires a new table for many-to-many relationship) and only those people can edit/complete the task
 
