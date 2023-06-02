@@ -99,6 +99,7 @@ def add():
     description = request.json.get('description')
     deadline_str = request.json.get('deadline')
 
+    print("deadline!!!!!", deadline_str)
     #changing string to datetime
     if deadline_str:
         deadline = datetime.datetime.strptime(deadline_str, '%Y-%m-%dT%H:%M')
