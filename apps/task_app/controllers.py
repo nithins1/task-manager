@@ -34,11 +34,23 @@ from yatl.helpers import A
 from .common import (T, auth, authenticated, cache, db, flash, logger, session,
                      unauthenticated)
 from .models import get_user_id
+from py4web.utils.url_signer import URLSigner
 
+url_signer = URLSigner(session)
 
 @action("index")
-@action.uses("index.html", auth, db)
+@action.uses("index.html", auth.user, db, url_signer)
 def index():
+    return dict(
+        get_tasks_url = URL('get_tasks', signer = url_signer),
+        complete_task_url = URL('complete_task', signer = url_signer),
+        edit_url = URL('edit', signer = url_signer),
+        add_url = URL('add', signer = url_signer)
+    )
+
+@action("get_tasks", method="GET")
+@action.uses(db, auth.user)
+def get_tasks():
     user_id = get_user_id()
 
     user_tasks = (db.tasks.user_id == user_id)
@@ -51,7 +63,7 @@ def index():
 
     return dict(completed=completed_tasks, uncompleted=uncompleted_tasks)
 
-
+"""
 @action("add", method=['GET', 'POST'])
 @action.uses("add.html", auth, db)
 def add():
@@ -62,10 +74,41 @@ def add():
         redirect(URL('index'))
 
     return dict(form=form)
+"""
 
+@action('add', method='POST')
+@action.uses(db, auth.user, url_signer.verify())
+def add():
+    name = request.json.get('name')
+    description = request.json.get('description')
+    deadline = request.json.get('deadline')
+
+    db.tasks.insert(name = name,
+                    description = description,
+                    deadline = deadline)
+    return "ok"
+
+@action('edit', method="POST")
+@action.uses(db, auth.user, url_signer.verify())
+def edit():
+    id = request.json.get('task_id')
+    name = request.json.get('name')
+    description = request.json.get('description')
+    deadline = request.json.get('deadline')
+
+    new_task = {
+        'name' : name,
+        'description' : description,
+        'deadline' : deadline
+    }
+    db(db.tasks.id == id).update(**new_task)
+    return "ok"
+
+"""
 @action('edit/<id:int>', method=["GET", "POST"])
 @action.uses(db, session, auth.user, 'edit.html')
 def edit(id=None):
+    
     assert id is not None
     p = db.tasks[id]
     if p is None or p.user_id != get_user_id():
@@ -74,14 +117,15 @@ def edit(id=None):
     if form.accepted:
         redirect(URL('index'))
     return dict(form=form)
+"""
 
-@action("complete/<id:int>")
-@action.uses(db, auth)
-def inc(id=None):
+@action("complete_task", method="POST")
+@action.uses(db, auth.user, url_signer.verify())
+def complete_task():
+    id = request.json.get('task_id')
     t = db.tasks[id]
-
     # Only allow update to occur if row's email matches current user
     if get_user_id() == t.user_id:
         status = db(db.tasks.id == t.id).select()[0]
         db(db.tasks.id == t.id).update(completed= not status.completed)
-    redirect(URL('index'))
+    return "ok"

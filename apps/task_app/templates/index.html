@@ -1,64 +1,153 @@
 [[extend 'layout.html']]
-<div class="columns">
-    <div class="column is-half">
-        <h2 class="is-size-2">Current Tasks</h2>
-        <br>
-        <a class="button is-success" href="[[=URL('add')]]">
-            <span class="icon"><i class="fa fa-plus"></i></span>
-            <span>Add</span>
-        </a>
-        <br>
-        <table class="table is-striped is-fullwidth">
-            <thead>
-                <tr>
-                    <th>Task Name</th>
-                    <th>Description</th>
-                    <th>Time Remaining</th>
-                    <th>Edit</th>
-                    <th>Mark Complete</th>
-                </tr>
-            </thead>
-            [[for task in uncompleted:]]
-            <tr>
-                <td>[[=task['name'] ]]</td>
-                <td>[[=task['description'] ]]</td>
-                [[if task['overdue']: ]]<td class="has-text-danger">[[else: ]]<td class="has-text-success">[[pass]][[=task['timeleft'] ]]</td>
-                <td>
-                    <a href="[[=URL('edit',task['id'])]]">Edit</a>
-                </td>
-                <td>
-                <a href="[[=URL('complete',task['id'])]]">Complete</a>
-                </td>
-            </tr>
-            [[pass]]
-        </table>
-    </div>
 
-    <div class="column">
-        <h2 class="is-size-2">Completed Tasks</h2>
-        <br>
-        <table class="table is-striped is-fullwidth">
-            <thead>
-                <tr>
-                    <th>Task Name</th>
-                    <th>Description</th>
-                    <th>Edit</th>
-                    <th>Restore</th>
-                </tr>
-            </thead>
-            [[for task in completed:]]
-            <tr>
-                <td>[[=task['name'] ]]</td>
-                <td>[[=task['description'] ]]</td>
-                <td>
-                    <a href="[[=URL('edit',task['id'])]]">Edit</a>
-                </td>
-                <td>
-                    <a href="[[=URL('complete',task['id'])]]">Restore</a>
-                </td>
-            </tr>
-            [[pass]]
-        </table>
-    </div>
+<style>
+    [v-cloak] {
+         display: none;
+    }
+</style>
+
+<div class="section" id="vue-target" v-cloak>
+    <div class="columns">
+        <div class="column">
+            <!--Blank-->
+        </div>
+
+        <!--main page-->
+        <div class="column is-three-quarters">
+            <div class="field" v-if="mode == 'add'">
+                <h2 class="title">Add task</h2>
+                <div class="field">
+                    <p class="subtitle is-4">Task name:</p>
+                    <input class="input" type="text" placeholder="type task name" v-model = "task_name">
+                </div>
+                <div class="field">
+                    <p class="subtitle is-4">Description:</p>
+                    <textarea class="textarea" placeholder="what are you going to do?" v-model="task_description" rows="10"></textarea>
+                </div>
+                <div class="field">
+                    <p class="subtitle is-4">Deadline:</p>
+                    <input class="input" type="datetime-local" placeholder="placeholderDateTime" v-model="task_deadline">
+                </div>
+                <div class="field">
+                    <p class="subtitle is-6 has-text-danger">{{warning}}</p>
+                </div>
+                <div class="field">
+                    <a @click="switch_mode(1)">
+                        <button class="button">Cancel</button>
+                    </a>
+                    <a @click="update()">
+                        <button class="button">Add</button>
+                    </a>
+                </div>
+            </div>
+            <!--edit task-->
+            <div class="field" v-if="mode == 'edit'">
+                <h2 class="title">Edit task</h2>
+                <div class="field">
+                    <p class="subtitle is-4">Task name:</p>
+                    <input class="input" type="text" v-model = "task_name">
+                </div>
+                <div class="field">
+                    <p class="subtitle is-4">Description:</p>
+                    <textarea class="textarea" v-model="task_description" rows="10"></textarea>
+                </div>
+                <div class="field">
+                    <p class="subtitle is-4">Deadline:</p>
+                    <input class="input" type="datetime-local" v-model="task_deadline">
+                </div>
+                <div class="field">
+                    <a @click="switch_mode(1)">
+                        <button class="button">Cancel</button>
+                    </a>
+                    <a @click="update()">
+                        <button class="button">Edit</button>
+                    </a>
+                </div>
+            </div>
+            
+            <!--if view mode show-->
+            <div v-if="mode== 'table'">
+                <!--uncompleted_task_table-->
+                <div class="field">
+                    <h2 class="is-size-2">Current Tasks</h2>
+                    <br>
+                    <a class="button is-success" @click="switch_mode(2)">
+                        <span class="icon"><i class="fa fa-plus"></i></span>
+                        <span>Add</span>
+                    </a>
+                    <br>
+                    <table class="table is-striped is-fullwidth">
+                        <thead>
+                            <tr>
+                                <th>Task Name</th>
+                                <th>Description</th>
+                                <th>Time Remaining</th>
+                                <th>Edit</th>
+                                <th>Mark Complete</th>
+                            </tr>
+                        </thead>
+                        <tbody v-for="untask in uncompleted_tasks">
+                            <tr>
+                                <td>{{untask.name}}</td>
+                                <td>{{untask.description}}</td>
+                                <td class="has-text-danger" v-if="untask.overdue">
+                                    {{untask.timeleft}}
+                                </td>
+                                <td class="has-text-success" v-else>
+                                    {{untask.timeleft}}
+                                </td>
+                                <td>
+                                    <a @click = "edit_mode(untask)">Edit</a>
+                                </td>
+                                <td>
+                                <a @click="completed(untask.id)">Complete</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!--completed_task_table-->
+                <div class="field" v-if="completed_tasks.length != 0">
+                    <h2 class="is-size-2">Completed Tasks</h2>
+                    <br>
+                    <table class="table is-striped is-fullwidth">
+                        <thead>
+                            <tr>
+                                <th>Task Name</th>
+                                <th>Description</th>
+                                <th>Edit</th>
+                                <th>Restore</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="task in completed_tasks">
+                                <td>{{task.name}}</td>
+                                <td>{{task.description}}</td>
+                                <td>
+                                    <a @click = "edit_mode(task)">Edit</a>
+                                </td>
+                                <td>
+                                    <a @click="completed(task.id)">Restore</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            <!--Blank-->
+        </div>
+    </div>    
 </div>
-
+[[block page_scripts]]
+<script>
+    let get_tasks_url = "[[=XML(get_tasks_url)]]";
+    let complete_task_url = "[[=XML(complete_task_url)]]";
+    let edit_url = "[[=XML(edit_url)]]";
+    let add_url = "[[=XML(add_url)]]"
+</script>
+<script src="js/index.js"></script>
+[[end]]
