@@ -14,6 +14,7 @@
 
         <!--main page-->
         <div class="column is-three-quarters">
+            <!--add task-->
             <div class="field" v-if="mode == 'add'">
                 <h2 class="title">Add task</h2>
                 <div class="field">
@@ -40,6 +41,25 @@
                     </a>
                 </div>
             </div>
+
+            <!--add tag-->
+            <div class="field" v-if="mode == 'addtag'">
+                <h2 class="title">Add tag</h2>
+                <div class="field">
+                    <p class="subtitle is-4">Tag name:</p>
+                    <input class="input" type="text" placeholder="type tag name" v-model = "tag_name">
+                </div>
+ 
+                <div class="field">
+                    <a @click="switch_mode(1)">
+                        <button class="button">Cancel</button>
+                    </a>
+                    <a @click="update()">
+                        <button class="button">Add</button>
+                    </a>
+                </div>
+            </div>
+
             <!--edit task-->
             <div class="field" v-if="mode == 'edit'">
                 <h2 class="title">Edit task</h2>
@@ -74,6 +94,11 @@
                     <a class="button is-success" @click="switch_mode(2)">
                         <span class="icon"><i class="fa fa-plus"></i></span>
                         <span>Add</span>
+                    </a>
+                    <br>
+                    <a class="button is-primary" @click="switch_mode(4)">
+                        <span class="icon"><i class="fa fa-plus"></i></span>
+                        <span>Create new tag</span>
                     </a>
                     <br>
                     <table class="table is-striped is-fullwidth">
@@ -148,6 +173,10 @@
     let complete_task_url = "[[=XML(complete_task_url)]]";
     let edit_url = "[[=XML(edit_url)]]";
     let add_url = "[[=XML(add_url)]]"
+    let addtag_url = "[[=XML(addtag_url)]]"
+    let get_tags_url = "[[=XML(get_tags_url)]]"
+
+
 </script>
 <script src="js/index.js"></script>
 [[end]]

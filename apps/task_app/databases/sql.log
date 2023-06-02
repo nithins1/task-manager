@@ -29,3 +29,11 @@ CREATE TABLE "tasks"(
     "completed" CHAR(1)
 );
 success!
+timestamp: 2023-06-02T15:54:09.687985
+CREATE TABLE "tags"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "name" CHAR(512),
+    "user_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ,
+    "color" CHAR(512)
+);
+success!

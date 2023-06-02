@@ -47,7 +47,9 @@ def index():
         get_tasks_url = URL('get_tasks', signer = url_signer),
         complete_task_url = URL('complete_task', signer = url_signer),
         edit_url = URL('edit', signer = url_signer),
-        add_url = URL('add', signer = url_signer)
+        add_url = URL('add', signer = url_signer),
+        addtag_url = URL('addtag', signer = url_signer),
+        get_tags_url = URL('get_tags', signer = url_signer)
     )
 
 #api for getting list of completed_task and uncompleted_task
@@ -65,6 +67,15 @@ def get_tasks():
         r['overdue'] = datetime.datetime.utcnow() > r['deadline']
 
     return dict(completed=completed_tasks, uncompleted=uncompleted_tasks)
+
+@action("get_tags", method="GET")
+@action.uses(db, auth.user)
+def get_tags():
+    user_id = get_user_id()
+
+    user_tags = db(db.tags.user_id == user_id).select()
+
+    return dict(tags=user_tags)
 
 """
 @action("add", method=['GET', 'POST'])
@@ -97,6 +108,16 @@ def add():
     db.tasks.insert(name = name,
                     description = description,
                     deadline = deadline)
+    return "ok"
+
+@action('addtag', method='POST')
+@action.uses(db, auth.user, url_signer.verify())
+def addtag():
+    #get all parameters
+    name = request.json.get('name')
+
+
+    db.tags.insert(name = name)
     return "ok"
 
 #api for edit existing task
