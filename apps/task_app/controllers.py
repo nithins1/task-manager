@@ -36,6 +36,8 @@ from .common import (T, auth, authenticated, cache, db, flash, logger, session,
 from .models import get_user_id
 from py4web.utils.url_signer import URLSigner
 
+
+
 url_signer = URLSigner(session)
 
 @action("index")
@@ -48,6 +50,7 @@ def index():
         add_url = URL('add', signer = url_signer)
     )
 
+#api for getting list of completed_task and uncompleted_task
 @action("get_tasks", method="GET")
 @action.uses(db, auth.user)
 def get_tasks():
@@ -76,25 +79,41 @@ def add():
     return dict(form=form)
 """
 
+#api for adding new task
 @action('add', method='POST')
 @action.uses(db, auth.user, url_signer.verify())
 def add():
+    #get all parameters
     name = request.json.get('name')
     description = request.json.get('description')
-    deadline = request.json.get('deadline')
+    deadline_str = request.json.get('deadline')
+
+    #changing string to datetime
+    if deadline_str:
+        deadline = datetime.datetime.strptime(deadline_str, '%Y-%m-%dT%H:%M')
+    else:
+        deadline = datetime.datetime.now()
 
     db.tasks.insert(name = name,
                     description = description,
                     deadline = deadline)
     return "ok"
 
+#api for edit existing task
 @action('edit', method="POST")
 @action.uses(db, auth.user, url_signer.verify())
 def edit():
+    #get all parameters
     id = request.json.get('task_id')
     name = request.json.get('name')
     description = request.json.get('description')
-    deadline = request.json.get('deadline')
+    deadline_str = request.json.get('deadline')
+
+    #changing string to datetime
+    if deadline_str:
+        deadline = datetime.datetime.strptime(deadline_str, '%Y-%m-%dT%H:%M')
+    else:
+        deadline = datetime.datetime.now()
 
     new_task = {
         'name' : name,
@@ -119,6 +138,7 @@ def edit(id=None):
     return dict(form=form)
 """
 
+#API for change the completed bool
 @action("complete_task", method="POST")
 @action.uses(db, auth.user, url_signer.verify())
 def complete_task():

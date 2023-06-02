@@ -68,8 +68,8 @@ let init = (app) => {
                 });
         }
 
-        //Block the error using warning
         if(app.vue.mode == "add"){
+            //Block the error using warning
             if(app.vue.task_name ===""){
                 app.vue.warning = "Type your task name";
                 return;
@@ -84,7 +84,7 @@ let init = (app) => {
             }
 
             app.vue.warning = "";
-            /*
+            
             axios.post(add_url, ({
                 name: app.vue.task_name, 
                 description: app.vue.task_description, 
@@ -97,7 +97,7 @@ let init = (app) => {
 
                     app.switch_mode(1);
                     app.get_tasks();
-                });*/
+                });
         }
     };
 
