@@ -11,11 +11,13 @@ let init = (app) => {
         // Complete as you see fit.
         uncompleted_tasks:[],
         completed_tasks:[],
+        all_tags:[],
         mode:"table",
         selected_task:0,
         task_name:"",
         task_description:"",
         task_deadline:"",
+        tag_name:"",
         warning:""
     };
 
@@ -36,6 +38,9 @@ let init = (app) => {
                 break;
             case 3:
                 app.vue.mode = "edit"
+                break;
+            case 4:
+                app.vue.mode = "addtag"
                 break;
             default:
                 app.vue.mode = "table"
@@ -99,12 +104,41 @@ let init = (app) => {
                     app.get_tasks();
                 });
         }
+
+        if(app.vue.mode == "addtag"){
+            //Block the error using warning
+            if(app.vue.tag_name ===""){
+                app.vue.warning = "Type your tag name";
+                return;
+            }
+
+            app.vue.warning = "";
+            
+            axios.post(addtag_url, ({
+                name: app.vue.tag_name})).then(function(response){
+                    console.log(response);
+                    app.vue.tag_name = "";
+
+                    app.switch_mode(1);
+                    app.get_tags();
+                });
+        }
     };
 
     app.get_tasks = function(){
         axios.get(get_tasks_url).then(function(respsonse){
             app.vue.uncompleted_tasks = app.enumerate(respsonse.data.uncompleted);
             app.vue.completed_tasks = app.enumerate(respsonse.data.completed);
+        });
+    };
+
+    app.get_tags = function(){
+        axios.get(get_tags_url).then(function(response){
+            app.vue.all_tags = app.enumerate(response.data.tags);
+            console.log("retrieved tags:");
+            app.vue.all_tags.forEach(function(e){
+                console.log(e);
+            });
         });
     };
 
@@ -135,6 +169,7 @@ let init = (app) => {
     app.init = () => {
         // Put here any initialization code.
         app.get_tasks();
+        app.get_tags();
         app.switch_mode(1);
     };
 
