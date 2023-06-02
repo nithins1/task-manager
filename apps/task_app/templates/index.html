@@ -95,11 +95,19 @@
                         <span class="icon"><i class="fa fa-plus"></i></span>
                         <span>Add</span>
                     </a>
-                    <br>
                     <a class="button is-primary" @click="switch_mode(4)">
                         <span class="icon"><i class="fa fa-plus"></i></span>
                         <span>Create new tag</span>
                     </a>
+                    <br>
+                    <div class="select">
+                        <select v-model="selected_tag">
+                            <option disabled :value="null"><i>Select a filter</i></option>
+                            <option :value="null"><i>No filter</i></option>
+                            <option v-for="tag in all_tags" :value="tag.id">{{tag.name}}</option>
+                        </select>
+                    </div>
+
                     <br>
                     <table class="table is-striped is-fullwidth">
                         <thead>
@@ -112,7 +120,7 @@
                             </tr>
                         </thead>
                         <tbody v-for="untask in uncompleted_tasks">
-                            <tr>
+                            <tr v-if="selected_tag == null || selected_tag == untask.tag">
                                 <td>{{untask.name}}</td>
                                 <td>{{untask.description}}</td>
                                 <td class="has-text-danger" v-if="untask.overdue">
@@ -145,8 +153,8 @@
                                 <th>Restore</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr v-for="task in completed_tasks">
+                        <tbody v-for="task in completed_tasks">
+                            <tr v-if="selected_tag == null || selected_tag == task.tag">
                                 <td>{{task.name}}</td>
                                 <td>{{task.description}}</td>
                                 <td>

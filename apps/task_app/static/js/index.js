@@ -18,7 +18,8 @@ let init = (app) => {
         task_description:"",
         task_deadline:"",
         tag_name:"",
-        warning:""
+        warning:"",
+        selected_tag:null,
     };
 
     app.enumerate = (a) => {

@@ -22,7 +22,7 @@ db.define_table(
     "tags",
     Field("name", requires=IS_NOT_EMPTY()),
     Field("user_id", "reference auth_user", default=get_user_id, writable=False,readable=False),
-    Field("color")
+    Field("color"),
 )
 
 db.define_table(
@@ -31,6 +31,6 @@ db.define_table(
     Field("description", "text", requires=IS_NOT_EMPTY()),
     Field("user_id", "reference auth_user", default=get_user_id, writable=False,readable=False),
     Field("deadline", "datetime"),
-    Field("completed", "boolean", default=False, writable=False,readable=False)
-    Field("tag", "reference tags")
+    Field("completed", "boolean", default=False, writable=False,readable=False),
+    Field("tag", "reference tags"),
 )
