@@ -30,6 +30,15 @@
                     <input class="input" type="datetime-local" placeholder="placeholderDateTime" v-model="task_deadline">
                 </div>
                 <div class="field">
+                    <p class="subtitle is-4">Tag:</p>
+                    <div class="select">
+                        <select v-model="form_sub_tag">
+                            <option disabled :value="null"><i>Select a tag</i></option>
+                            <option v-for="tag in all_tags" :value="tag.id">{{tag.name}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="field">
                     <p class="subtitle is-6 has-text-danger">{{warning}}</p>
                 </div>
                 <div class="field">
@@ -76,6 +85,15 @@
                     <input class="input" type="datetime-local" v-model="task_deadline">
                 </div>
                 <div class="field">
+                    <p class="subtitle is-4">Tag:</p>
+                    <div class="select">
+                        <select v-model="form_sub_tag">
+                            <option disabled :value="null"><i>Select a tag</i></option>
+                            <option v-for="tag in all_tags" :value="tag.id">{{tag.name}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="field">
                     <a @click="switch_mode(1)">
                         <button class="button">Cancel</button>
                     </a>
@@ -115,6 +133,7 @@
                                 <th>Task Name</th>
                                 <th>Description</th>
                                 <th>Time Remaining</th>
+                                <th>Tag</th>
                                 <th>Edit</th>
                                 <th>Mark Complete</th>
                             </tr>
@@ -128,6 +147,9 @@
                                 </td>
                                 <td class="has-text-success" v-else>
                                     {{untask.timeleft}}
+                                </td>
+                                <td>
+                                    <span class="tag is-primary">{{tag_name_from_id(untask.tag)}}</span>
                                 </td>
                                 <td>
                                     <a @click = "edit_mode(untask)">Edit</a>
@@ -149,6 +171,7 @@
                             <tr>
                                 <th>Task Name</th>
                                 <th>Description</th>
+                                <th>Tag</th>
                                 <th>Edit</th>
                                 <th>Restore</th>
                             </tr>
@@ -157,6 +180,9 @@
                             <tr v-if="selected_tag == null || selected_tag == task.tag">
                                 <td>{{task.name}}</td>
                                 <td>{{task.description}}</td>
+                                <td>
+                                    <span class="tag is-primary">{{tag_name_from_id(task.tag)}}</span>
+                                </td>
                                 <td>
                                     <a @click = "edit_mode(task)">Edit</a>
                                 </td>

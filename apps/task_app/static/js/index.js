@@ -19,6 +19,7 @@ let init = (app) => {
         task_deadline:"",
         tag_name:"",
         warning:"",
+        form_sub_tag:"",
         selected_tag:null,
     };
 
@@ -53,6 +54,7 @@ let init = (app) => {
         app.vue.task_name = task.name;
         app.vue.task_description = task.description;
         app.vue.task_deadline = task.deadline;
+        app.vue.form_sub_tag = task.tag;
         app.switch_mode(3)
     };
 
@@ -62,7 +64,8 @@ let init = (app) => {
                 task_id: app.vue.selected_task, 
                 name: app.vue.task_name, 
                 description: app.vue.task_description, 
-                deadline:app.vue.task_deadline})).then(function(respsonse){
+                deadline:app.vue.task_deadline,
+                tag:app.vue.form_sub_tag})).then(function(respsonse){
                     console.log(respsonse);
                     app.vue.selected_task = 0;
                     app.vue.task_name = "";
@@ -94,7 +97,8 @@ let init = (app) => {
             axios.post(add_url, ({
                 name: app.vue.task_name, 
                 description: app.vue.task_description, 
-                deadline:app.vue.task_deadline})).then(function(respsonse){
+                deadline:app.vue.task_deadline,
+                tag:app.vue.form_sub_tag})).then(function(respsonse){
                     console.log(respsonse);
                     app.vue.selected_task = 0;
                     app.vue.task_name = "";
@@ -143,6 +147,14 @@ let init = (app) => {
         });
     };
 
+    app.tag_name_from_id = function (id){
+        let tag_obj = app.vue.all_tags.find(obj => {return obj.id == id});
+        if (tag_obj) {
+            return tag_obj.name;
+        } else {
+            return "";
+        }
+    }
     app.completed = function(task_id){
         axios.post(complete_task_url, {task_id: task_id}).then(function(respsonse){
             console.log(respsonse);
@@ -156,7 +168,8 @@ let init = (app) => {
         completed: app.completed,
         switch_mode: app.switch_mode,
         edit_mode: app.edit_mode,
-        update: app.update
+        update: app.update,
+        tag_name_from_id: app.tag_name_from_id,
     };
 
     // This creates the Vue instance.

@@ -98,6 +98,10 @@ def add():
     name = request.json.get('name')
     description = request.json.get('description')
     deadline_str = request.json.get('deadline')
+    tag_id = request.json.get('tag')
+    if not db.tags[tag_id]:
+        print("recieved no valid tag id")
+        tag_id = None
 
     print("deadline!!!!!", deadline_str)
     #changing string to datetime
@@ -108,7 +112,8 @@ def add():
 
     db.tasks.insert(name = name,
                     description = description,
-                    deadline = deadline)
+                    deadline = deadline,
+                    tag = tag_id)
     return "ok"
 
 @action('addtag', method='POST')
@@ -130,6 +135,10 @@ def edit():
     name = request.json.get('name')
     description = request.json.get('description')
     deadline_str = request.json.get('deadline')
+    tag_id = request.json.get('tag')
+    if not db.tags[tag_id]:
+        print("recieved no valid tag id")
+        tag_id = None
 
     print(deadline_str)
 
@@ -145,7 +154,8 @@ def edit():
     new_task = {
         'name' : name,
         'description' : description,
-        'deadline' : deadline
+        'deadline' : deadline,
+        'tag': tag_id
     }
     db(db.tasks.id == id).update(**new_task)
     return "ok"
