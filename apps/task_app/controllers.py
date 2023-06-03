@@ -109,9 +109,14 @@ def edit():
     description = request.json.get('description')
     deadline_str = request.json.get('deadline')
 
+    print(deadline_str)
+
     #changing string to datetime
     if deadline_str:
-        deadline = datetime.datetime.strptime(deadline_str, '%Y-%m-%dT%H:%M')
+        try:
+            deadline = datetime.datetime.strptime(deadline_str, '%Y-%m-%dT%H:%M')
+        except ValueError:
+            deadline = datetime.datetime.strptime(deadline_str, '%Y-%m-%d %H:%M:%S')
     else:
         deadline = datetime.datetime.now()
 
