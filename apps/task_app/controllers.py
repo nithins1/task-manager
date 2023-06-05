@@ -29,14 +29,12 @@ import datetime
 
 from py4web import URL, action, redirect, request
 from py4web.utils.form import Form, FormStyleBulma
+from py4web.utils.url_signer import URLSigner
 from yatl.helpers import A
 
 from .common import (T, auth, authenticated, cache, db, flash, logger, session,
                      unauthenticated)
 from .models import get_user_id
-from py4web.utils.url_signer import URLSigner
-
-
 
 url_signer = URLSigner(session)
 
@@ -121,9 +119,12 @@ def add():
 def addtag():
     #get all parameters
     name = request.json.get('name')
+    color = request.json.get('color').lower()
+    colors = ['white', 'black', 'red', 'green', 'blue', 'yellow', 'cyan']
+    if color not in colors:
+        color = 'white'
 
-
-    db.tags.insert(name = name)
+    db.tags.insert(name = name, color = color)
     return "ok"
 
 #api for edit existing task

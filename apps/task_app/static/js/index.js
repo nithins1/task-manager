@@ -20,6 +20,8 @@ let init = (app) => {
         tag_name:"",
         warning:"",
         form_sub_tag:"",
+        form_tag_color:"",
+        tag_colors:[],
         selected_tag:null,
     };
 
@@ -120,7 +122,8 @@ let init = (app) => {
             app.vue.warning = "";
             
             axios.post(addtag_url, ({
-                name: app.vue.tag_name})).then(function(response){
+                name: app.vue.tag_name,
+                color: app.vue.form_tag_color})).then(function(response){
                     console.log(response);
                     app.vue.tag_name = "";
 
@@ -155,6 +158,16 @@ let init = (app) => {
             return "";
         }
     }
+
+    app.tag_color_from_id = function (id){
+        let tag_obj = app.vue.all_tags.find(obj => {return obj.id == id});
+        if (tag_obj) {
+            let converter = {white: 'is-white', black: 'is-black', red: 'is-danger', green: 'is-success', blue: 'is-link', yellow: 'is-warning', cyan: 'is-info'}
+            return converter[tag_obj.color] || 'is-white'
+        } else {
+            return 'is-white'
+        }
+    }
     app.completed = function(task_id){
         axios.post(complete_task_url, {task_id: task_id}).then(function(respsonse){
             console.log(respsonse);
@@ -170,6 +183,7 @@ let init = (app) => {
         edit_mode: app.edit_mode,
         update: app.update,
         tag_name_from_id: app.tag_name_from_id,
+        tag_color_from_id: app.tag_color_from_id,
     };
 
     // This creates the Vue instance.
@@ -182,6 +196,7 @@ let init = (app) => {
     // And this initializes it.
     app.init = () => {
         // Put here any initialization code.
+        app.vue.tag_colors = ['white', 'black', 'red', 'green', 'blue', 'yellow', 'cyan']
         app.get_tasks();
         app.get_tags();
         app.switch_mode(1);
