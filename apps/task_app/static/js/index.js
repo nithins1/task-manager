@@ -16,6 +16,7 @@ let init = (app) => {
         task_name:"",
         task_description:"",
         task_deadline:"",
+        users: [],
         warning:""
     };
 
@@ -25,6 +26,16 @@ let init = (app) => {
         a.map((e) => {e._idx = k++;});
         return a;
     };
+
+    app.get_selected_users = function(){
+        let selected = [];
+        app.vue.users.forEach(user => {
+            if (user.selected) {
+                selected.push(user.user.id);
+            }
+        });
+        return selected;
+    }
 
     app.switch_mode = function(m){
         switch(m){
@@ -56,16 +67,19 @@ let init = (app) => {
                 task_id: app.vue.selected_task, 
                 name: app.vue.task_name, 
                 description: app.vue.task_description, 
-                deadline:app.vue.task_deadline})).then(function(respsonse){
-                    console.log(respsonse);
-                    app.vue.selected_task = 0;
-                    app.vue.task_name = "";
-                    app.vue.task_description = "";
-                    app.vue.task_deadline = "";
+                deadline: app.vue.task_deadline,
+                assigned: app.get_selected_users()
+            })).then(function(respsonse){
+                console.log(respsonse);
+                app.vue.selected_task = 0;
+                app.vue.task_name = "";
+                app.vue.task_description = "";
+                app.vue.task_deadline = "";
+                app.vue.users = [];
 
-                    app.switch_mode(1);
-                    app.get_tasks();
-                });
+                app.switch_mode(1);
+                app.get_tasks();
+            });
         }
 
         if(app.vue.mode == "add"){
@@ -88,16 +102,19 @@ let init = (app) => {
             axios.post(add_url, ({
                 name: app.vue.task_name, 
                 description: app.vue.task_description, 
-                deadline:app.vue.task_deadline})).then(function(respsonse){
-                    console.log(respsonse);
-                    app.vue.selected_task = 0;
-                    app.vue.task_name = "";
-                    app.vue.task_description = "";
-                    app.vue.task_deadline = "";
+                deadline:app.vue.task_deadline,
+                assigned: app.get_selected_users()
+            })).then(function(respsonse){
+                console.log(respsonse);
+                app.vue.selected_task = 0;
+                app.vue.task_name = "";
+                app.vue.task_description = "";
+                app.vue.task_deadline = "";
+                app.vue.users = [];
 
-                    app.switch_mode(1);
-                    app.get_tasks();
-                });
+                app.switch_mode(1);
+                app.get_tasks();
+            });
         }
     };
 
@@ -113,7 +130,20 @@ let init = (app) => {
             console.log(respsonse);
             app.get_tasks();
         });
-    }
+    };
+
+    app.get_users = function() {
+        axios.get(get_users_url).then(function(r) {
+            //app.vue.users = r.data.users;
+            r.data.users.forEach(user => {
+                app.vue.users.push({user:user, selected:false});
+            });
+        });
+    };
+
+    app.assign_user = function(idx) {
+        app.vue.users[idx].selected = !app.vue.users[idx].selected;
+    };
 
     // This contains all the methods.
     app.methods = {
@@ -121,6 +151,8 @@ let init = (app) => {
         completed: app.completed,
         switch_mode: app.switch_mode,
         edit_mode: app.edit_mode,
+        get_users: app.get_users,
+        assign_user: app.assign_user,
         update: app.update
     };
 

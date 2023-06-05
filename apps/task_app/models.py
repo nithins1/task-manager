@@ -26,3 +26,11 @@ db.define_table(
     Field("deadline", "datetime"),
     Field("completed", "boolean", default=False, writable=False,readable=False)
 )
+
+db.define_table(
+    "assigned",
+    Field("asignee", "reference auth_user"),
+    Field("task_id", "reference tasks")
+)
+
+db.commit()

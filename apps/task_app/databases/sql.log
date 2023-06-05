@@ -29,3 +29,48 @@ CREATE TABLE "tasks"(
     "completed" CHAR(1)
 );
 success!
+timestamp: 2023-06-04T19:56:18.576829
+ALTER TABLE "tasks" ADD "assigned" TEXT;
+success!
+success!
+timestamp: 2023-06-04T19:59:03.702338
+CREATE TABLE "assigned"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "table_id" INTEGER REFERENCES "tasks" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ,
+    "asignee" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE ON UPDATE CASCADE  
+);
+success!
+success!
+timestamp: 2023-06-04T20:19:57.925083
+ALTER TABLE "assigned" ADD "task_id" INTEGER REFERENCES "tasks" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ;
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
