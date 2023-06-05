@@ -14,6 +14,7 @@
 
         <!--main page-->
         <div class="column is-three-quarters">
+            <!--add task-->
             <div class="field" v-if="mode == 'add'">
                 <h2 class="title">Add task</h2>
                 <div class="field">
@@ -29,6 +30,15 @@
                     <input class="input" type="datetime-local" placeholder="placeholderDateTime" v-model="task_deadline">
                 </div>
                 <div class="field">
+                    <p class="subtitle is-4">Tag:</p>
+                    <div class="select">
+                        <select v-model="form_sub_tag">
+                            <option disabled :value="null"><i>Select a tag</i></option>
+                            <option v-for="tag in all_tags" :value="tag.id">{{tag.name}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="field">
                     <p class="subtitle is-6 has-text-danger">{{warning}}</p>
                 </div>
                 <div class="field">
@@ -40,6 +50,25 @@
                     </a>
                 </div>
             </div>
+
+            <!--add tag-->
+            <div class="field" v-if="mode == 'addtag'">
+                <h2 class="title">Add tag</h2>
+                <div class="field">
+                    <p class="subtitle is-4">Tag name:</p>
+                    <input class="input" type="text" placeholder="type tag name" v-model = "tag_name">
+                </div>
+ 
+                <div class="field">
+                    <a @click="switch_mode(1)">
+                        <button class="button">Cancel</button>
+                    </a>
+                    <a @click="update()">
+                        <button class="button">Add</button>
+                    </a>
+                </div>
+            </div>
+
             <!--edit task-->
             <div class="field" v-if="mode == 'edit'">
                 <h2 class="title">Edit task</h2>
@@ -54,6 +83,15 @@
                 <div class="field">
                     <p class="subtitle is-4">Deadline:</p>
                     <input class="input" type="datetime-local" v-model="task_deadline">
+                </div>
+                <div class="field">
+                    <p class="subtitle is-4">Tag:</p>
+                    <div class="select">
+                        <select v-model="form_sub_tag">
+                            <option disabled :value="null"><i>Select a tag</i></option>
+                            <option v-for="tag in all_tags" :value="tag.id">{{tag.name}}</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="field">
                     <a @click="switch_mode(1)">
@@ -75,6 +113,19 @@
                         <span class="icon"><i class="fa fa-plus"></i></span>
                         <span>Add</span>
                     </a>
+                    <a class="button is-primary" @click="switch_mode(4)">
+                        <span class="icon"><i class="fa fa-plus"></i></span>
+                        <span>Create new tag</span>
+                    </a>
+                    <br>
+                    <div class="select">
+                        <select v-model="selected_tag">
+                            <option disabled :value="null"><i>Select a filter</i></option>
+                            <option :value="null"><i>No filter</i></option>
+                            <option v-for="tag in all_tags" :value="tag.id">{{tag.name}}</option>
+                        </select>
+                    </div>
+
                     <br>
                     <table class="table is-striped is-fullwidth">
                         <thead>
@@ -82,12 +133,13 @@
                                 <th>Task Name</th>
                                 <th>Description</th>
                                 <th>Time Remaining</th>
+                                <th>Tag</th>
                                 <th>Edit</th>
                                 <th>Mark Complete</th>
                             </tr>
                         </thead>
                         <tbody v-for="untask in uncompleted_tasks">
-                            <tr>
+                            <tr v-if="selected_tag == null || selected_tag == untask.tag">
                                 <td>{{untask.name}}</td>
                                 <td>{{untask.description}}</td>
                                 <td class="has-text-danger" v-if="untask.overdue">
@@ -95,6 +147,9 @@
                                 </td>
                                 <td class="has-text-success" v-else>
                                     {{untask.timeleft}}
+                                </td>
+                                <td>
+                                    <span class="tag is-primary">{{tag_name_from_id(untask.tag)}}</span>
                                 </td>
                                 <td>
                                     <a @click = "edit_mode(untask)">Edit</a>
@@ -116,14 +171,18 @@
                             <tr>
                                 <th>Task Name</th>
                                 <th>Description</th>
+                                <th>Tag</th>
                                 <th>Edit</th>
                                 <th>Restore</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr v-for="task in completed_tasks">
+                        <tbody v-for="task in completed_tasks">
+                            <tr v-if="selected_tag == null || selected_tag == task.tag">
                                 <td>{{task.name}}</td>
                                 <td>{{task.description}}</td>
+                                <td>
+                                    <span class="tag is-primary">{{tag_name_from_id(task.tag)}}</span>
+                                </td>
                                 <td>
                                     <a @click = "edit_mode(task)">Edit</a>
                                 </td>
@@ -148,6 +207,10 @@
     let complete_task_url = "[[=XML(complete_task_url)]]";
     let edit_url = "[[=XML(edit_url)]]";
     let add_url = "[[=XML(add_url)]]"
+    let addtag_url = "[[=XML(addtag_url)]]"
+    let get_tags_url = "[[=XML(get_tags_url)]]"
+
+
 </script>
 <script src="js/index.js"></script>
 [[end]]
