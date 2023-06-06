@@ -58,6 +58,14 @@
                     <p class="subtitle is-4">Tag name:</p>
                     <input class="input" type="text" placeholder="type tag name" v-model = "tag_name">
                 </div>
+
+                <div class="field">
+                    <p class="subtitle is-4">Color:</p>
+                    <select v-model="form_tag_color">
+                        <option disabled :value="'White'"><i>Select a color</i></option>
+                        <option v-for="color in tag_colors"><i>{{color}}</i></option>
+                    </select>
+                </div>
  
                 <div class="field">
                     <a @click="switch_mode(1)">
@@ -149,7 +157,7 @@
                                     {{untask.timeleft}}
                                 </td>
                                 <td>
-                                    <span class="tag is-primary">{{tag_name_from_id(untask.tag)}}</span>
+                                    <span class="tag" :class="tag_color_from_id(untask.tag)">{{tag_name_from_id(untask.tag)}}</span>
                                 </td>
                                 <td>
                                     <a @click = "edit_mode(untask)">Edit</a>
@@ -181,7 +189,7 @@
                                 <td>{{task.name}}</td>
                                 <td>{{task.description}}</td>
                                 <td>
-                                    <span class="tag is-primary">{{tag_name_from_id(task.tag)}}</span>
+                                    <span class="tag" :class="tag_color_from_id(task.tag)">{{tag_name_from_id(task.tag)}}</span>
                                 </td>
                                 <td>
                                     <a @click = "edit_mode(task)">Edit</a>
