@@ -106,6 +106,19 @@
                     <input class="input" type="datetime-local" v-model="task_deadline">
                 </div>
                 <div class="field">
+                    <p class="subtitle is-4">Assign</p>
+                    <p class="control">
+                        <span class="field" v-for="(user, idx) in users">
+                            <button class="button is-info" v-if="user.selected" v-on:click="assign_user(idx)">
+                                {{user.user.first_name}}
+                            </button>
+                            <button class="button" v-else v-on:click="assign_user(idx)">
+                                {{user.user.first_name}}
+                            </button>
+                        </span>
+                    </p>
+                </div>
+                <div class="field">
                     <p class="subtitle is-4">Tag:</p>
                     <div class="select">
                         <select v-model="form_sub_tag">
@@ -154,6 +167,7 @@
                                 <th>Task Name</th>
                                 <th>Description</th>
                                 <th>Time Remaining</th>
+                                <th>Assgined</th>
                                 <th>Tag</th>
                                 <th>Edit</th>
                                 <th>Mark Complete</th>
@@ -170,10 +184,13 @@
                                     {{untask.timeleft}}
                                 </td>
                                 <td>
+                                    {{untask.assigned.join(", ")}}
+                                </td>
+                                <td>
                                     <span class="tag" :class="tag_color_from_id(untask.tag)">{{tag_name_from_id(untask.tag)}}</span>
                                 </td>
                                 <td>
-                                    <a @click = "edit_mode(untask)">Edit</a>
+                                    <a  v-on:click="edit_mode(untask), get_users()">Edit</a>
                                 </td>
                                 <td>
                                 <a @click="completed(untask.id)">Complete</a>
@@ -192,6 +209,7 @@
                             <tr>
                                 <th>Task Name</th>
                                 <th>Description</th>
+                                <th>Assgined</th>
                                 <th>Tag</th>
                                 <th>Edit</th>
                                 <th>Restore</th>
@@ -202,13 +220,16 @@
                                 <td>{{task.name}}</td>
                                 <td>{{task.description}}</td>
                                 <td>
+                                    {{task.assigned.join(", ")}}
+                                </td>
+                                <td>
                                     <span class="tag" :class="tag_color_from_id(task.tag)">{{tag_name_from_id(task.tag)}}</span>
                                 </td>
                                 <td>
-                                    <a @click = "edit_mode(task)">Edit</a>
+                                    <a v-on:click = "edit_mode(task), get_users()">Edit</a>
                                 </td>
                                 <td>
-                                    <a @click="completed(task.id)">Restore</a>
+                                    <a  v-on:click="completed(task.id)">Restore</a>
                                 </td>
                             </tr>
                         </tbody>
@@ -225,12 +246,12 @@
 [[block page_scripts]]
 <script>
     let get_tasks_url = "[[=XML(get_tasks_url)]]";
-    let get_users_url = "[[=XML(get_users_url)]]"
+    let get_users_url = "[[=XML(get_users_url)]]";
     let complete_task_url = "[[=XML(complete_task_url)]]";
     let edit_url = "[[=XML(edit_url)]]";
-    let add_url = "[[=XML(add_url)]]"
-    let addtag_url = "[[=XML(addtag_url)]]"
-    let get_tags_url = "[[=XML(get_tags_url)]]"
+    let add_url = "[[=XML(add_url)]]";
+    let addtag_url = "[[=XML(addtag_url)]]";
+    let get_tags_url = "[[=XML(get_tags_url)]]";
 
 
 </script>
