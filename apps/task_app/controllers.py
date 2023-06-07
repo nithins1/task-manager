@@ -57,10 +57,12 @@ def index():
 def get_tasks():
     user_id = get_user_id()
 
-    user_tasks = ((db.tasks.user_id == user_id) | (db.assigned.asignee == user_id))
-    uncompleted_tasks = db(user_tasks & (db.tasks.completed == False)).select().as_list()
-    completed_tasks = db(user_tasks & (db.tasks.completed == True)).select().as_list()
-    print(uncompleted_tasks)
+    user_tasks = db((db.tasks.user_id == user_id)).select(db.tasks.ALL).as_list()
+    assigned_tasks = db((db.assigned.asignee == user_id) & (db.tasks.id == db.assigned.task_id)).select(db.tasks.ALL).as_list()
+    
+    uncompleted_tasks = [t for t in user_tasks if t['completed'] == False] + [t for t in assigned_tasks if t['completed'] == False]
+    completed_tasks = [t for t in user_tasks if t['completed'] == True] + [t for t in assigned_tasks if t['completed'] == True]
+
     for r in uncompleted_tasks:
         r['timeleft'] =  r['deadline'] - datetime.datetime.utcnow()
         r['overdue'] = datetime.datetime.utcnow() > r['deadline']
@@ -156,8 +158,12 @@ def edit(id=None):
 def complete_task():
     id = request.json.get('task_id')
     t = db.tasks[id]
+    assginees = db((db.assigned.task_id == t)).select(db.assigned.asignee).as_list()
+    assginee_ids = [a['asignee'] for a in assginees if 'asignee' in a]
+    assginee_ids.append(t.user_id)
+
     # Only allow update to occur if row's email matches current user
-    if get_user_id() == t.user_id:
+    if get_user_id() in assginee_ids:
         status = db(db.tasks.id == t.id).select()[0]
         db(db.tasks.id == t.id).update(completed= not status.completed)
     return "ok"
@@ -166,6 +172,6 @@ def complete_task():
 @action.uses(db, auth.user)
 def get_users():
     
-    users = db(db.auth_user).select().as_list()
+    users = db(db.auth_user.id != get_user_id()).select().as_list()
 
     return dict(users=users)

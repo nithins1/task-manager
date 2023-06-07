@@ -35,7 +35,7 @@ let init = (app) => {
             }
         });
         return selected;
-    }
+    };
 
     app.switch_mode = function(m){
         switch(m){
@@ -51,7 +51,7 @@ let init = (app) => {
             default:
                 app.vue.mode = "table"
         }
-    }
+    };
 
     app.edit_mode = function(task){
         app.vue.selected_task = task.id;
