@@ -43,6 +43,7 @@ let init = (app) => {
         return selected;
     };
 
+
     app.switch_mode = function(m){
         switch(m){
             case 1:

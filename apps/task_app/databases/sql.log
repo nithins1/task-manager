@@ -87,3 +87,35 @@ timestamp: 2023-06-02T16:09:47.171961
 ALTER TABLE "tasks" ADD "tag" INTEGER REFERENCES "tags" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ;
 >>>>>>> MAIN
 success!
+timestamp: 2023-06-07T02:56:19.343823
+ALTER TABLE "tasks" ADD "tag" INTEGER REFERENCES "tags" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ;
+success!
+success!
+success!
+success!
+timestamp: 2023-06-07T03:27:58.484335
+CREATE TABLE "tags"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "name" CHAR(512),
+    "user_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ,
+    "color" CHAR(512)
+);
+success!
+timestamp: 2023-06-07T03:27:58.492481
+CREATE TABLE "tasks"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "name" CHAR(512),
+    "description" TEXT,
+    "user_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ,
+    "deadline" TIMESTAMP,
+    "completed" CHAR(1),
+    "tag" INTEGER REFERENCES "tags" ("id") ON DELETE CASCADE ON UPDATE CASCADE  
+);
+success!
+timestamp: 2023-06-07T03:27:58.499068
+CREATE TABLE "assigned"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "asignee" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ,
+    "task_id" INTEGER REFERENCES "tasks" ("id") ON DELETE CASCADE ON UPDATE CASCADE  
+);
+success!

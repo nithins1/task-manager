@@ -66,6 +66,9 @@ def get_tasks():
     for r in uncompleted_tasks:
         r['timeleft'] =  r['deadline'] - datetime.datetime.utcnow()
         r['overdue'] = datetime.datetime.utcnow() > r['deadline']
+        r['assigned'] = get_assigned_users(r['id'])
+    for r in completed_tasks:
+        r['assigned'] = get_assigned_users(r['id'])
 
     return dict(completed=completed_tasks, uncompleted=uncompleted_tasks)
 
@@ -101,7 +104,7 @@ def add():
     deadline_str = request.json.get('deadline')
     assigned = request.json.get('assigned')
     tag_id = request.json.get('tag')
-    if not db.tags[tag_id]:
+    if tag_id and not db.tags[tag_id]:
         print("recieved no valid tag id")
         tag_id = None
 
@@ -210,3 +213,10 @@ def get_users():
     users = db(db.auth_user.id != get_user_id()).select().as_list()
 
     return dict(users=users)
+
+def get_assigned_users(task_id):
+
+    assignees_ids = db((db.assigned.task_id == task_id)).select(db.assigned.asignee).as_list()
+    assignees_names = [db.auth_user[a['asignee']].first_name for a in assignees_ids if 'asignee' in a]
+
+    return assignees_names
