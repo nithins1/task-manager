@@ -11,13 +11,19 @@ let init = (app) => {
         // Complete as you see fit.
         uncompleted_tasks:[],
         completed_tasks:[],
+        all_tags:[],
         mode:"table",
         selected_task:0,
         task_name:"",
         task_description:"",
         task_deadline:"",
-        users: [],
-        warning:""
+        tag_name:"",
+        warning:"",
+        form_sub_tag:"",
+        form_tag_color:"",
+        tag_colors:[],
+        selected_tag:null,
+        users: []
     };
 
     app.enumerate = (a) => {
@@ -48,6 +54,9 @@ let init = (app) => {
             case 3:
                 app.vue.mode = "edit"
                 break;
+            case 4:
+                app.vue.mode = "addtag"
+                break;
             default:
                 app.vue.mode = "table"
         }
@@ -58,6 +67,7 @@ let init = (app) => {
         app.vue.task_name = task.name;
         app.vue.task_description = task.description;
         app.vue.task_deadline = task.deadline;
+        app.vue.form_sub_tag = task.tag;
         app.switch_mode(3)
     };
 
@@ -68,7 +78,8 @@ let init = (app) => {
                 name: app.vue.task_name, 
                 description: app.vue.task_description, 
                 deadline: app.vue.task_deadline,
-                assigned: app.get_selected_users()
+                assigned: app.get_selected_users(),
+                tag:app.vue.form_sub_tag
             })).then(function(respsonse){
                 console.log(respsonse);
                 app.vue.selected_task = 0;
@@ -103,7 +114,8 @@ let init = (app) => {
                 name: app.vue.task_name, 
                 description: app.vue.task_description, 
                 deadline:app.vue.task_deadline,
-                assigned: app.get_selected_users()
+                assigned: app.get_selected_users(),
+                tag:app.vue.form_sub_tag
             })).then(function(respsonse){
                 console.log(respsonse);
                 app.vue.selected_task = 0;
@@ -116,6 +128,26 @@ let init = (app) => {
                 app.get_tasks();
             });
         }
+
+        if(app.vue.mode == "addtag"){
+            //Block the error using warning
+            if(app.vue.tag_name ===""){
+                app.vue.warning = "Type your tag name";
+                return;
+            }
+
+            app.vue.warning = "";
+            
+            axios.post(addtag_url, ({
+                name: app.vue.tag_name,
+                color: app.vue.form_tag_color})).then(function(response){
+                    console.log(response);
+                    app.vue.tag_name = "";
+
+                    app.switch_mode(1);
+                    app.get_tags();
+                });
+        }
     };
 
     app.get_tasks = function(){
@@ -125,12 +157,40 @@ let init = (app) => {
         });
     };
 
+    app.get_tags = function(){
+        axios.get(get_tags_url).then(function(response){
+            app.vue.all_tags = app.enumerate(response.data.tags);
+            console.log("retrieved tags:");
+            app.vue.all_tags.forEach(function(e){
+                console.log(e);
+            });
+        });
+    };
+
+    app.tag_name_from_id = function (id){
+        let tag_obj = app.vue.all_tags.find(obj => {return obj.id == id});
+        if (tag_obj) {
+            return tag_obj.name;
+        } else {
+            return "";
+        }
+    }
+
+    app.tag_color_from_id = function (id){
+        let tag_obj = app.vue.all_tags.find(obj => {return obj.id == id});
+        if (tag_obj) {
+            let converter = {white: 'is-white', black: 'is-black', red: 'is-danger', green: 'is-success', blue: 'is-link', yellow: 'is-warning', cyan: 'is-info'}
+            return converter[tag_obj.color] || 'is-white'
+        } else {
+            return 'is-white'
+        }
+    }
     app.completed = function(task_id){
         axios.post(complete_task_url, {task_id: task_id}).then(function(respsonse){
             console.log(respsonse);
             app.get_tasks();
         });
-    };
+    }
 
     app.get_users = function() {
         axios.get(get_users_url).then(function(r) {
@@ -144,7 +204,6 @@ let init = (app) => {
     app.assign_user = function(idx) {
         app.vue.users[idx].selected = !app.vue.users[idx].selected;
     };
-
     // This contains all the methods.
     app.methods = {
         get_tasks: app.get_tasks,
@@ -153,6 +212,8 @@ let init = (app) => {
         edit_mode: app.edit_mode,
         get_users: app.get_users,
         assign_user: app.assign_user,
+        tag_name_from_id: app.tag_name_from_id,
+        tag_color_from_id: app.tag_color_from_id,
         update: app.update
     };
 
@@ -166,7 +227,9 @@ let init = (app) => {
     // And this initializes it.
     app.init = () => {
         // Put here any initialization code.
+        app.vue.tag_colors = ['white', 'black', 'red', 'green', 'blue', 'yellow', 'cyan']
         app.get_tasks();
+        app.get_tags();
         app.switch_mode(1);
     };
 

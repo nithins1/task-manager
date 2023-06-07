@@ -29,14 +29,12 @@ import datetime
 
 from py4web import URL, action, redirect, request
 from py4web.utils.form import Form, FormStyleBulma
+from py4web.utils.url_signer import URLSigner
 from yatl.helpers import A
 
 from .common import (T, auth, authenticated, cache, db, flash, logger, session,
                      unauthenticated)
 from .models import get_user_id
-from py4web.utils.url_signer import URLSigner
-
-
 
 url_signer = URLSigner(session)
 
@@ -48,7 +46,9 @@ def index():
         get_users_url = URL('get_users', signer = url_signer),
         complete_task_url = URL('complete_task', signer = url_signer),
         edit_url = URL('edit', signer = url_signer),
-        add_url = URL('add', signer = url_signer)
+        add_url = URL('add', signer = url_signer),
+        addtag_url = URL('addtag', signer = url_signer),
+        get_tags_url = URL('get_tags', signer = url_signer)
     )
 
 #api for getting list of completed_task and uncompleted_task
@@ -68,6 +68,15 @@ def get_tasks():
         r['overdue'] = datetime.datetime.utcnow() > r['deadline']
 
     return dict(completed=completed_tasks, uncompleted=uncompleted_tasks)
+
+@action("get_tags", method="GET")
+@action.uses(db, auth.user)
+def get_tags():
+    user_id = get_user_id()
+
+    user_tags = db(db.tags.user_id == user_id).select()
+
+    return dict(tags=user_tags)
 
 """
 @action("add", method=['GET', 'POST'])
@@ -91,6 +100,12 @@ def add():
     description = request.json.get('description')
     deadline_str = request.json.get('deadline')
     assigned = request.json.get('assigned')
+    tag_id = request.json.get('tag')
+    if not db.tags[tag_id]:
+        print("recieved no valid tag id")
+        tag_id = None
+
+    print("deadline!!!!!", deadline_str)
     #changing string to datetime
     if deadline_str:
         deadline = datetime.datetime.strptime(deadline_str, '%Y-%m-%dT%H:%M')
@@ -99,13 +114,28 @@ def add():
 
     new_task = db.tasks.insert(name = name,
                     description = description,
-                    deadline = deadline)
+                    deadline = deadline,
+                    tag = tag_id
+                    )
     for user in assigned:
         db.assigned.insert(
             asignee = user,
             task_id = new_task
         )
     
+    return "ok"
+
+@action('addtag', method='POST')
+@action.uses(db, auth.user, url_signer.verify())
+def addtag():
+    #get all parameters
+    name = request.json.get('name')
+    color = request.json.get('color').lower()
+    colors = ['white', 'black', 'red', 'green', 'blue', 'yellow', 'cyan']
+    if color not in colors:
+        color = 'white'
+
+    db.tags.insert(name = name, color = color)
     return "ok"
 
 #api for edit existing task
@@ -117,6 +147,10 @@ def edit():
     name = request.json.get('name')
     description = request.json.get('description')
     deadline_str = request.json.get('deadline')
+    tag_id = request.json.get('tag')
+    if not db.tags[tag_id]:
+        print("recieved no valid tag id")
+        tag_id = None
 
     print(deadline_str)
 
@@ -132,7 +166,8 @@ def edit():
     new_task = {
         'name' : name,
         'description' : description,
-        'deadline' : deadline
+        'deadline' : deadline,
+        'tag': tag_id
     }
     db(db.tasks.id == id).update(**new_task)
     return "ok"

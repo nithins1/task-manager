@@ -29,6 +29,7 @@ CREATE TABLE "tasks"(
     "completed" CHAR(1)
 );
 success!
+<<<<<<< HEAD
 timestamp: 2023-06-04T19:56:18.576829
 ALTER TABLE "tasks" ADD "assigned" TEXT;
 success!
@@ -73,4 +74,16 @@ success!
 success!
 success!
 success!
+=======
+timestamp: 2023-06-02T15:54:09.687985
+CREATE TABLE "tags"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "name" CHAR(512),
+    "user_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ,
+    "color" CHAR(512)
+);
+success!
+timestamp: 2023-06-02T16:09:47.171961
+ALTER TABLE "tasks" ADD "tag" INTEGER REFERENCES "tags" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ;
+>>>>>>> MAIN
 success!
