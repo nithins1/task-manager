@@ -34,3 +34,11 @@ db.define_table(
     Field("completed", "boolean", default=False, writable=False,readable=False),
     Field("tag", "reference tags"),
 )
+
+db.define_table(
+    "assigned",
+    Field("asignee", "reference auth_user"),
+    Field("task_id", "reference tasks")
+)
+
+db.commit()

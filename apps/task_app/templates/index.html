@@ -12,7 +12,7 @@
             <!--Blank-->
         </div>
 
-        <!--main page-->
+        <!--add page-->
         <div class="column is-three-quarters">
             <!--add task-->
             <div class="field" v-if="mode == 'add'">
@@ -28,6 +28,19 @@
                 <div class="field">
                     <p class="subtitle is-4">Deadline:</p>
                     <input class="input" type="datetime-local" placeholder="placeholderDateTime" v-model="task_deadline">
+                </div>
+                <div class="field">
+                    <p class="subtitle is-4">Assign</p>
+                    <p class="control">
+                        <span class="field" v-for="(user, idx) in users">
+                            <button class="button is-info" v-if="user.selected" v-on:click="assign_user(idx)">
+                                {{user.user.first_name}}
+                            </button>
+                            <button class="button" v-else v-on:click="assign_user(idx)">
+                                {{user.user.first_name}}
+                            </button>
+                        </span>
+                    </p>
                 </div>
                 <div class="field">
                     <p class="subtitle is-4">Tag:</p>
@@ -111,13 +124,13 @@
                 </div>
             </div>
             
-            <!--if view mode show-->
+            <!--main page-->
             <div v-if="mode== 'table'">
                 <!--uncompleted_task_table-->
                 <div class="field">
                     <h2 class="is-size-2">Current Tasks</h2>
                     <br>
-                    <a class="button is-success" @click="switch_mode(2)">
+                    <a class="button is-success" @click="switch_mode(2), get_users()">
                         <span class="icon"><i class="fa fa-plus"></i></span>
                         <span>Add</span>
                     </a>
@@ -212,6 +225,7 @@
 [[block page_scripts]]
 <script>
     let get_tasks_url = "[[=XML(get_tasks_url)]]";
+    let get_users_url = "[[=XML(get_users_url)]]"
     let complete_task_url = "[[=XML(complete_task_url)]]";
     let edit_url = "[[=XML(edit_url)]]";
     let add_url = "[[=XML(add_url)]]"

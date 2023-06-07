@@ -23,6 +23,7 @@ let init = (app) => {
         form_tag_color:"",
         tag_colors:[],
         selected_tag:null,
+        users: []
     };
 
     app.enumerate = (a) => {
@@ -30,6 +31,16 @@ let init = (app) => {
         let k = 0;
         a.map((e) => {e._idx = k++;});
         return a;
+    };
+
+    app.get_selected_users = function(){
+        let selected = [];
+        app.vue.users.forEach(user => {
+            if (user.selected) {
+                selected.push(user.user.id);
+            }
+        });
+        return selected;
     };
 
     app.switch_mode = function(m){
@@ -49,7 +60,7 @@ let init = (app) => {
             default:
                 app.vue.mode = "table"
         }
-    }
+    };
 
     app.edit_mode = function(task){
         app.vue.selected_task = task.id;
@@ -66,17 +77,20 @@ let init = (app) => {
                 task_id: app.vue.selected_task, 
                 name: app.vue.task_name, 
                 description: app.vue.task_description, 
-                deadline:app.vue.task_deadline,
-                tag:app.vue.form_sub_tag})).then(function(respsonse){
-                    console.log(respsonse);
-                    app.vue.selected_task = 0;
-                    app.vue.task_name = "";
-                    app.vue.task_description = "";
-                    app.vue.task_deadline = "";
+                deadline: app.vue.task_deadline,
+                assigned: app.get_selected_users(),
+                tag:app.vue.form_sub_tag
+            })).then(function(respsonse){
+                console.log(respsonse);
+                app.vue.selected_task = 0;
+                app.vue.task_name = "";
+                app.vue.task_description = "";
+                app.vue.task_deadline = "";
+                app.vue.users = [];
 
-                    app.switch_mode(1);
-                    app.get_tasks();
-                });
+                app.switch_mode(1);
+                app.get_tasks();
+            });
         }
 
         if(app.vue.mode == "add"){
@@ -100,16 +114,19 @@ let init = (app) => {
                 name: app.vue.task_name, 
                 description: app.vue.task_description, 
                 deadline:app.vue.task_deadline,
-                tag:app.vue.form_sub_tag})).then(function(respsonse){
-                    console.log(respsonse);
-                    app.vue.selected_task = 0;
-                    app.vue.task_name = "";
-                    app.vue.task_description = "";
-                    app.vue.task_deadline = "";
+                assigned: app.get_selected_users(),
+                tag:app.vue.form_sub_tag
+            })).then(function(respsonse){
+                console.log(respsonse);
+                app.vue.selected_task = 0;
+                app.vue.task_name = "";
+                app.vue.task_description = "";
+                app.vue.task_deadline = "";
+                app.vue.users = [];
 
-                    app.switch_mode(1);
-                    app.get_tasks();
-                });
+                app.switch_mode(1);
+                app.get_tasks();
+            });
         }
 
         if(app.vue.mode == "addtag"){
@@ -175,15 +192,29 @@ let init = (app) => {
         });
     }
 
+    app.get_users = function() {
+        axios.get(get_users_url).then(function(r) {
+            //app.vue.users = r.data.users;
+            r.data.users.forEach(user => {
+                app.vue.users.push({user:user, selected:false});
+            });
+        });
+    };
+
+    app.assign_user = function(idx) {
+        app.vue.users[idx].selected = !app.vue.users[idx].selected;
+    };
     // This contains all the methods.
     app.methods = {
         get_tasks: app.get_tasks,
         completed: app.completed,
         switch_mode: app.switch_mode,
         edit_mode: app.edit_mode,
-        update: app.update,
+        get_users: app.get_users,
+        assign_user: app.assign_user,
         tag_name_from_id: app.tag_name_from_id,
         tag_color_from_id: app.tag_color_from_id,
+        update: app.update
     };
 
     // This creates the Vue instance.
