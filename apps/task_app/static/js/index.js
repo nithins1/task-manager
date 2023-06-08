@@ -166,6 +166,11 @@ let init = (app) => {
         axios.get(get_tasks_url).then(function(respsonse){
             app.vue.uncompleted_tasks = app.enumerate(respsonse.data.uncompleted);
             app.vue.completed_tasks = app.enumerate(respsonse.data.completed);
+
+            app.vue.uncompleted_tasks.forEach(task => {
+                console.log(task.timeleft);
+                task.timeleft = Sugar.Date(task.timeleft).relative().raw;
+            });
         });
     };
 
@@ -207,22 +212,23 @@ let init = (app) => {
     app.get_users = function(selected_users=[]) {
         let users = [];
         axios.get(get_users_url).then(function(r) {
-            //app.vue.users = r.data.users;
+            // If there are items in selected users...
             if (selected_users) {
+                // if user in selected users...
                 r.data.users.forEach(user => {
                     if (selected_users.includes(user.first_name)){
-                        users.push({user:user, selected:true});
+                        users.push({user:user, selected:true}); // mark as true
                     } else {
-                        users.push({user:user, selected:false});
+                        users.push({user:user, selected:false}); // mark as false
                     }
                 });
-                app.vue.past_selected = JSON.parse(JSON.stringify(users));
+                app.vue.past_selected = JSON.parse(JSON.stringify(users)); // copy
             } else {
                 r.data.users.forEach(user => {
-                    users.push({user:user, selected:false});
+                    users.push({user:user, selected:false}); // else just mark all users as false
                 });
             }
-            app.vue.users = JSON.parse(JSON.stringify(users));
+            app.vue.users = JSON.parse(JSON.stringify(users)); // copy
         });
     };
 
