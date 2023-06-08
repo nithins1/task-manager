@@ -1,6 +1,6 @@
-# task-manager
+# Task Manager
 
-
+### To view documentation, [click here](https://github.com/nithins1/task-manager/blob/main/User-Guide.pdf)
 
 # Description (200 words)
 A web application where you can enter tasks that you need to do and when they need to be completed by. The site will display which of your tasks are currently incomplete, and you can mark them as complete by clicking a button. You can also view previously completed tasks and mark them as incomplete to reactivate them.
