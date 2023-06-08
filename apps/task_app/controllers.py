@@ -1,30 +1,3 @@
-"""
-This file defines actions, i.e. functions the URLs are mapped into
-The @action(path) decorator exposed the function at URL:
-
-    http://127.0.0.1:8000/{app_name}/{path}
-
-If app_name == '_default' then simply
-
-    http://127.0.0.1:8000/{path}
-
-If path == 'index' it can be omitted:
-
-    http://127.0.0.1:8000/
-
-The path follows the bottlepy syntax.
-
-@action.uses('generic.html')  indicates that the action uses the generic.html template
-@action.uses(session)         indicates that the action uses the session
-@action.uses(db)              indicates that the action uses the db
-@action.uses(T)               indicates that the action uses the i18n & pluralization
-@action.uses(auth.user)       indicates that the action requires a logged in user
-@action.uses(auth)            indicates that the action requires the auth object
-
-session, db, T, auth, and tempates are examples of Fixtures.
-Warning: Fixtures MUST be declared with @action.uses({fixtures}) else your app will result in undefined behavior
-"""
-
 import datetime
 
 from py4web import URL, action, redirect, request
@@ -34,7 +7,7 @@ from yatl.helpers import A
 
 from .common import (T, auth, authenticated, cache, db, flash, logger, session,
                      unauthenticated)
-from .models import get_user_id
+from .models import get_user_id, get_user_firstname
 
 url_signer = URLSigner(session)
 
@@ -64,7 +37,7 @@ def get_tasks():
     completed_tasks = [t for t in user_tasks if t['completed'] == True] + [t for t in assigned_tasks if t['completed'] == True]
 
     for r in uncompleted_tasks:
-        r['timeleft'] =  r['deadline'] - datetime.datetime.utcnow()
+        r['timeleft'] =  r['deadline'].isoformat()
         r['overdue'] = datetime.datetime.utcnow() > r['deadline']
         r['assigned'] = get_assigned_users(r['id'])
     for r in completed_tasks:
@@ -80,19 +53,6 @@ def get_tags():
     user_tags = db(db.tags.user_id == user_id).select()
 
     return dict(tags=user_tags)
-
-"""
-@action("add", method=['GET', 'POST'])
-@action.uses("add.html", auth, db)
-def add():
-    if not get_user_id:
-        redirect(URL('index'))
-    form = Form(db.tasks, formstyle=FormStyleBulma, csrf_session=session)
-    if form.accepted:
-        redirect(URL('index'))
-
-    return dict(form=form)
-"""
 
 #api for adding new task
 @action('add', method='POST')
@@ -176,7 +136,7 @@ def edit():
     }
     db(db.tasks.id == id).update(**new_task)
     print(assigned)
-    # [[curr], [pass]]
+    # [[current], [past]]
     add = list(set(assigned[0]) - (set(assigned[0]) & set(assigned[1])))
     remove = list(set(assigned[1]) - (set(assigned[0]) & set(assigned[1])))
     
@@ -189,21 +149,6 @@ def edit():
         db((db.assigned.task_id == id) & (db.assigned.asignee == user)).delete()
 
     return "ok"
-
-"""
-@action('edit/<id:int>', method=["GET", "POST"])
-@action.uses(db, session, auth.user, 'edit.html')
-def edit(id=None):
-    
-    assert id is not None
-    p = db.tasks[id]
-    if p is None or p.user_id != get_user_id():
-        redirect(URL('index'))
-    form = Form(db.tasks, record=p, deletable=False, csrf_session=session, formstyle=FormStyleBulma)
-    if form.accepted:
-        redirect(URL('index'))
-    return dict(form=form)
-"""
 
 #API for change the completed bool
 @action("complete_task", method="POST")
@@ -224,14 +169,20 @@ def complete_task():
 @action("get_users", method="GET")
 @action.uses(db, auth.user)
 def get_users():
-    
     users = db(db.auth_user.id != get_user_id()).select().as_list()
-
     return dict(users=users)
 
 def get_assigned_users(task_id):
 
     assignees_ids = db((db.assigned.task_id == task_id)).select(db.assigned.asignee).as_list()
-    assignees_names = [db.auth_user[a['asignee']].first_name for a in assignees_ids if 'asignee' in a]
+    #assignees_names = [db.auth_user[a['asignee']].first_name for a in assignees_ids if 'asignee' in a]
+    assignees_names = []
+
+    for user in assignees_ids:
+        if 'asignee' in user:
+            if db.auth_user[user['asignee']].first_name == get_user_firstname():
+                assignees_names.append("You")
+            else:
+                assignees_names.append(db.auth_user[user['asignee']].first_name)
 
     return assignees_names

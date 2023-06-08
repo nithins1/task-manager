@@ -187,7 +187,8 @@
                                     {{untask.assigned.join(", ")}}
                                 </td>
                                 <td>
-                                    <span class="tag" :class="tag_color_from_id(untask.tag)">{{tag_name_from_id(untask.tag)}}</span>
+                                    <span class="tag" :class="tag_color_from_id(untask.tag)" v-if="tag_name_from_id(untask.tag)">{{tag_name_from_id(untask.tag)}}</span>
+                                    <span v-else>No Tags</span>
                                 </td>
                                 <td>
                                     <a  v-on:click="edit_mode(untask)">Edit</a>
@@ -223,7 +224,8 @@
                                     {{task.assigned.join(", ")}}
                                 </td>
                                 <td>
-                                    <span class="tag" :class="tag_color_from_id(task.tag)">{{tag_name_from_id(task.tag)}}</span>
+                                    <span class="tag" :class="tag_color_from_id(task.tag)" v-if="tag_name_from_id(task.tag)">{{tag_name_from_id(task.tag)}}</span>
+                                    <span v-else>No Tags</span>
                                 </td>
                                 <td>
                                     <a v-on:click = "edit_mode(task)">Edit</a>

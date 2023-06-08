@@ -17,6 +17,8 @@ from .common import Field, auth, db
 
 def get_user_id():
     return auth.current_user.get('id') if auth.current_user else None
+def get_user_firstname():
+    return auth.current_user.get('first_name') if auth.current_user else None
 
 db.define_table(
     "tags",
