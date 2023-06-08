@@ -150,7 +150,9 @@ def edit():
     name = request.json.get('name')
     description = request.json.get('description')
     deadline_str = request.json.get('deadline')
+    assigned = request.json.get('assigned')
     tag_id = request.json.get('tag')
+    
     if not db.tags[tag_id]:
         print("recieved no valid tag id")
         tag_id = None
@@ -173,6 +175,19 @@ def edit():
         'tag': tag_id
     }
     db(db.tasks.id == id).update(**new_task)
+    print(assigned)
+    # [[curr], [pass]]
+    add = list(set(assigned[0]) - (set(assigned[0]) & set(assigned[1])))
+    remove = list(set(assigned[1]) - (set(assigned[0]) & set(assigned[1])))
+    
+    for user in add:
+        db.assigned.insert(
+            asignee = user,
+            task_id = id
+        )
+    for user in remove:
+        db((db.assigned.task_id == id) & (db.assigned.asignee == user)).delete()
+
     return "ok"
 
 """

@@ -190,7 +190,7 @@
                                     <span class="tag" :class="tag_color_from_id(untask.tag)">{{tag_name_from_id(untask.tag)}}</span>
                                 </td>
                                 <td>
-                                    <a  v-on:click="edit_mode(untask), get_users()">Edit</a>
+                                    <a  v-on:click="edit_mode(untask)">Edit</a>
                                 </td>
                                 <td>
                                 <a @click="completed(untask.id)">Complete</a>
@@ -226,7 +226,7 @@
                                     <span class="tag" :class="tag_color_from_id(task.tag)">{{tag_name_from_id(task.tag)}}</span>
                                 </td>
                                 <td>
-                                    <a v-on:click = "edit_mode(task), get_users()">Edit</a>
+                                    <a v-on:click = "edit_mode(task)">Edit</a>
                                 </td>
                                 <td>
                                     <a  v-on:click="completed(task.id)">Restore</a>

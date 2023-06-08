@@ -23,7 +23,8 @@ let init = (app) => {
         form_tag_color:"",
         tag_colors:[],
         selected_tag:null,
-        users: []
+        users: [],
+        past_selected: []
     };
 
     app.enumerate = (a) => {
@@ -36,6 +37,15 @@ let init = (app) => {
     app.get_selected_users = function(){
         let selected = [];
         app.vue.users.forEach(user => {
+            if (user.selected) {
+                selected.push(user.user.id);
+            }
+        });
+        return selected;
+    };
+    app.get_selected_past_users = function(){
+        let selected = [];
+        app.vue.past_selected.forEach(user => {
             if (user.selected) {
                 selected.push(user.user.id);
             }
@@ -69,6 +79,7 @@ let init = (app) => {
         app.vue.task_description = task.description;
         app.vue.task_deadline = task.deadline;
         app.vue.form_sub_tag = task.tag;
+        app.get_users(task.assigned);
         app.switch_mode(3)
     };
 
@@ -79,7 +90,7 @@ let init = (app) => {
                 name: app.vue.task_name, 
                 description: app.vue.task_description, 
                 deadline: app.vue.task_deadline,
-                assigned: app.get_selected_users(),
+                assigned: [app.get_selected_users(), app.get_selected_past_users()],
                 tag:app.vue.form_sub_tag
             })).then(function(respsonse){
                 console.log(respsonse);
@@ -193,12 +204,25 @@ let init = (app) => {
         });
     }
 
-    app.get_users = function() {
+    app.get_users = function(selected_users=[]) {
+        let users = [];
         axios.get(get_users_url).then(function(r) {
             //app.vue.users = r.data.users;
-            r.data.users.forEach(user => {
-                app.vue.users.push({user:user, selected:false});
-            });
+            if (selected_users) {
+                r.data.users.forEach(user => {
+                    if (selected_users.includes(user.first_name)){
+                        users.push({user:user, selected:true});
+                    } else {
+                        users.push({user:user, selected:false});
+                    }
+                });
+                app.vue.past_selected = JSON.parse(JSON.stringify(users));
+            } else {
+                r.data.users.forEach(user => {
+                    users.push({user:user, selected:false});
+                });
+            }
+            app.vue.users = JSON.parse(JSON.stringify(users));
         });
     };
 
