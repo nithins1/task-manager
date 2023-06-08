@@ -167,7 +167,7 @@
                                 <th>Task Name</th>
                                 <th>Description</th>
                                 <th>Time Remaining</th>
-                                <th>Assgined</th>
+                                <th>Assigned</th>
                                 <th>Tag</th>
                                 <th>Edit</th>
                                 <th>Mark Complete</th>
@@ -191,10 +191,10 @@
                                     <span v-else>No Tags</span>
                                 </td>
                                 <td>
-                                    <a  v-on:click="edit_mode(untask)">Edit</a>
+                                    <a class="button is-warning" v-on:click="edit_mode(untask)"><span class="icon"><i class="fa fa-edit"></i></span></a>
                                 </td>
                                 <td>
-                                <a @click="completed(untask.id)">Complete</a>
+                                    <a class="button is-success" @click="completed(untask.id)"><span class="icon"><i class="fa fa-check"></i></span></a>
                                 </td>
                             </tr>
                         </tbody>
@@ -210,7 +210,7 @@
                             <tr>
                                 <th>Task Name</th>
                                 <th>Description</th>
-                                <th>Assgined</th>
+                                <th>Assigned</th>
                                 <th>Tag</th>
                                 <th>Edit</th>
                                 <th>Restore</th>
@@ -228,10 +228,10 @@
                                     <span v-else>No Tags</span>
                                 </td>
                                 <td>
-                                    <a v-on:click = "edit_mode(task)">Edit</a>
+                                    <a class="button is-warning" v-on:click="edit_mode(task)"><span class="icon"><i class="fa fa-edit"></i></span></a>
                                 </td>
                                 <td>
-                                    <a  v-on:click="completed(task.id)">Restore</a>
+                                    <a class="button is-primary" @click="completed(task.id)"><span class="icon"><i class="fa fa-plus"></i></span></a>
                                 </td>
                             </tr>
                         </tbody>
