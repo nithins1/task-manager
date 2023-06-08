@@ -38,7 +38,7 @@ def get_tasks():
 
     for r in uncompleted_tasks:
         r['timeleft'] =  r['deadline'].isoformat()
-        r['overdue'] = datetime.datetime.utcnow() > r['deadline']
+        r['overdue'] = datetime.datetime.utcnow() > r['deadline'] + datetime.timedelta(hours = 7)
         r['assigned'] = get_assigned_users(r['id'])
     for r in completed_tasks:
         r['assigned'] = get_assigned_users(r['id'])

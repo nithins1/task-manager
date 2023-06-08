@@ -169,7 +169,7 @@ let init = (app) => {
 
             app.vue.uncompleted_tasks.forEach(task => {
                 console.log(task.timeleft);
-                task.timeleft = Sugar.Date(task.timeleft + "Z").relative().raw;
+                task.timeleft = Sugar.Date(task.timeleft).relative().raw;
             });
         });
     };
