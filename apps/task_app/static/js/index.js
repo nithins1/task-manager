@@ -35,6 +35,7 @@ let init = (app) => {
         return a;
     };
 
+    // Get the selected users from the user list
     app.get_selected_users = function(){
         let selected = [];
         app.vue.users.forEach(user => {
@@ -44,6 +45,8 @@ let init = (app) => {
         });
         return selected;
     };
+    
+    // Get the selected users from the past user list
     app.get_selected_past_users = function(){
         let selected = [];
         app.vue.past_selected.forEach(user => {
@@ -77,6 +80,7 @@ let init = (app) => {
         }
     };
 
+    // Show the details of a task
     app.show_detail = function(task){
         app.vue.selected_task = task.id;
         app.vue.task_name = task.name;
@@ -87,6 +91,7 @@ let init = (app) => {
         app.switch_mode(5)
     };
 
+    // Switch to edit mode for a task
     app.edit_mode = function(task){
         app.vue.selected_task = task.id;
         app.vue.task_name = task.name;
@@ -97,6 +102,7 @@ let init = (app) => {
         app.switch_mode(3)
     };
 
+    // Update the task or tag
     app.update = function(){
         if(app.vue.mode == "edit"){
             axios.post(edit_url, ({
@@ -176,6 +182,7 @@ let init = (app) => {
         }
     };
 
+    // Get all the tasks
     app.get_tasks = function(){
         axios.get(get_tasks_url).then(function(respsonse){
             app.vue.uncompleted_tasks = app.enumerate(respsonse.data.uncompleted);
@@ -188,6 +195,7 @@ let init = (app) => {
         });
     };
 
+    // Get all the tags
     app.get_tags = function(){
         axios.get(get_tags_url).then(function(response){
             app.vue.all_tags = app.enumerate(response.data.tags);
@@ -198,6 +206,7 @@ let init = (app) => {
         });
     };
 
+    // Get tag name from its ID
     app.tag_name_from_id = function (id){
         let tag_obj = app.vue.all_tags.find(obj => {return obj.id == id});
         if (tag_obj) {
@@ -207,6 +216,7 @@ let init = (app) => {
         }
     }
 
+    // Get tag color from its ID
     app.tag_color_from_id = function (id){
         let tag_obj = app.vue.all_tags.find(obj => {return obj.id == id});
         if (tag_obj) {
@@ -216,6 +226,8 @@ let init = (app) => {
             return 'is-white'
         }
     }
+    
+    // Mark a task as completed
     app.completed = function(task_id){
         axios.post(complete_task_url, {task_id: task_id}).then(function(respsonse){
             console.log(respsonse);
@@ -223,6 +235,7 @@ let init = (app) => {
         });
     }
 
+    // Get all the users
     app.get_users = function(selected_users=[]) {
         let users = [];
         axios.get(get_users_url).then(function(r) {
