@@ -24,7 +24,8 @@ let init = (app) => {
         tag_colors:[],
         selected_tag:null,
         users: [],
-        past_selected: []
+        past_selected: [],
+        display_asign:""
     };
 
     app.enumerate = (a) => {
@@ -74,6 +75,16 @@ let init = (app) => {
             default:
                 app.vue.mode = "table"
         }
+    };
+
+    app.show_detail = function(task){
+        app.vue.selected_task = task.id;
+        app.vue.task_name = task.name;
+        app.vue.task_description = task.description;
+        app.vue.task_deadline = task.deadline;
+        app.vue.form_sub_tag = task.tag;
+        app.vue.display_asign = task.assigned.join(", ");
+        app.switch_mode(5)
     };
 
     app.edit_mode = function(task){
@@ -248,7 +259,8 @@ let init = (app) => {
         assign_user: app.assign_user,
         tag_name_from_id: app.tag_name_from_id,
         tag_color_from_id: app.tag_color_from_id,
-        update: app.update
+        update: app.update,
+        show_detail: app.show_detail
     };
 
     // This creates the Vue instance.

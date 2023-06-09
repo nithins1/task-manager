@@ -137,6 +137,20 @@
                 </div>
             </div>
             
+            <!--show_detail-->
+            <div class="field" v-if="mode=='detail'">
+                <h1 class="title is-1">{{task_name}}</h1>
+                <p class="subtitle is-6"> <b>Tag:</b> {{tag_name_from_id(form_sub_tag)}}</p>
+                <textarea class="textarea" readonly>{{ task_description }}</textarea>
+                <p class="subtitle is-6"> <b>Asigned to: </b> {{display_asign}}</p>
+                <p class="title is-5">Deadline: {{task_deadline}}</p>
+                <a @click="switch_mode(1)">
+                    <button class="button">
+                        Back
+                    </button>
+                </a>
+            </div>
+
             <!--main page-->
             <div v-if="mode== 'table'">
                 <!--uncompleted_task_table-->
@@ -178,7 +192,7 @@
                                 <td>{{untask.name}}</td>
                                 <td>
                                     {{untask.description.slice(0,20)}}
-                                    <a v-if="untask.description.length > 20">... (detail)</a>
+                                    <a v-if="untask.description.length > 20" @click="show_detail(untask)">... (detail)</a>
                                 </td>
                                 <td class="has-text-danger" v-if="untask.overdue">
                                     {{untask.timeleft}}
@@ -222,7 +236,10 @@
                         <tbody v-for="task in completed_tasks">
                             <tr v-if="selected_tag == null || selected_tag == task.tag">
                                 <td>{{task.name}}</td>
-                                <td>{{task.description.slice(0,20)}}</td>
+                                <td>
+                                    {{task.description.slice(0,20)}}
+                                    <a v-if="task.description.length > 20" @click="show_detail(task)">... (detail)</a>
+                                </td>
                                 <td>
                                     {{task.assigned.join(", ")}}
                                 </td>
