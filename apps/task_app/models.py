@@ -6,20 +6,14 @@ from pydal.validators import *
 
 from .common import Field, auth, db
 
-### Define your table below
-#
-# db.define_table('thing', Field('name'))
-#
-## always commit your models to avoid problems later
-#
-# db.commit()
-#
-
 def get_user_id():
+    # Retrieve the ID of the current user if available
     return auth.current_user.get('id') if auth.current_user else None
 def get_user_firstname():
+    # Retrieve the first name of the current user if available
     return auth.current_user.get('first_name') if auth.current_user else None
 
+# Define the 'tags' table
 db.define_table(
     "tags",
     Field("name", requires=IS_NOT_EMPTY()),
@@ -27,6 +21,7 @@ db.define_table(
     Field("color"),
 )
 
+# Define the 'tasks' table
 db.define_table(
     "tasks",
     Field("name", requires=IS_NOT_EMPTY()),
@@ -37,6 +32,7 @@ db.define_table(
     Field("tag", "reference tags"),
 )
 
+# Define the 'assigned' table
 db.define_table(
     "assigned",
     Field("asignee", "reference auth_user"),
