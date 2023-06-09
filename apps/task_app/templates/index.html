@@ -9,18 +9,22 @@
 <div class="section" id="vue-target" v-cloak>
     <div class="columns">
         <div class="column">
-            <!--Blank-->
+            <!-- Blank -->
         </div>
 
-        <!--add page-->
+        <!-- Add page-->
         <div class="column is-three-quarters">
-            <!--add task-->
+            <!-- Add task-->
             <div class="field" v-if="mode == 'add'">
                 <h2 class="title">Add task</h2>
+
+                <!-- Task name -->
                 <div class="field">
                     <p class="subtitle is-4">Task name:</p>
                     <input class="input" type="text" placeholder="type task name" v-model = "task_name">
                 </div>
+
+                <!-- Description -->
                 <div class="field">
                     <p class="subtitle is-4">Description:</p>
                     <textarea class="textarea" placeholder="what are you going to do?" v-model="task_description" rows="10"></textarea>
@@ -29,10 +33,13 @@
                     <p class="subtitle is-4">Deadline:</p>
                     <input class="input" type="datetime-local" placeholder="placeholderDateTime" v-model="task_deadline">
                 </div>
+
+                <!-- Deadline -->
                 <div class="field">
                     <p class="subtitle is-4">Assign</p>
                     <p class="control">
                         <span class="field" v-for="(user, idx) in users">
+                            <!-- Display different button styles based on user selection -->
                             <button class="button is-info" v-if="user.selected" v-on:click="assign_user(idx)">
                                 {{user.user.first_name}}
                             </button>
@@ -42,11 +49,15 @@
                         </span>
                     </p>
                 </div>
+
+                <!-- Assign -->
                 <div class="field">
                     <p class="subtitle is-4">Tag:</p>
                     <div class="select">
                         <select v-model="form_sub_tag">
+                            <!-- Disable initial option and provide placeholder text -->
                             <option disabled :value="null"><i>Select a tag</i></option>
+                            <!-- Generate dynamic options based on available tags -->
                             <option v-for="tag in all_tags" :value="tag.id">{{tag.name}}</option>
                         </select>
                     </div>
@@ -64,7 +75,7 @@
                 </div>
             </div>
 
-            <!--add tag-->
+            <!-- Add tag -->
             <div class="field" v-if="mode == 'addtag'">
                 <h2 class="title">Add tag</h2>
                 <div class="field">
@@ -75,7 +86,9 @@
                 <div class="field">
                     <p class="subtitle is-4">Color:</p>
                     <select v-model="form_tag_color">
+                        <!-- Disable initial option and provide placeholder text -->
                         <option disabled :value="'White'"><i>Select a color</i></option>
+                        <!-- Generate dynamic options based on available tag colors -->
                         <option v-for="color in tag_colors"><i>{{color}}</i></option>
                     </select>
                 </div>
@@ -90,7 +103,7 @@
                 </div>
             </div>
 
-            <!--edit task-->
+            <!-- Edit task -->
             <div class="field" v-if="mode == 'edit'">
                 <h2 class="title">Edit task</h2>
                 <div class="field">
@@ -109,6 +122,7 @@
                     <p class="subtitle is-4">Assign</p>
                     <p class="control">
                         <span class="field" v-for="(user, idx) in users">
+                            <!-- Display different button styles based on user selection -->
                             <button class="button is-info" v-if="user.selected" v-on:click="assign_user(idx)">
                                 {{user.user.first_name}}
                             </button>
@@ -122,7 +136,9 @@
                     <p class="subtitle is-4">Tag:</p>
                     <div class="select">
                         <select v-model="form_sub_tag">
+                            <!-- Disable initial option and provide placeholder text -->
                             <option disabled :value="null"><i>Select a tag</i></option>
+                            <!-- Generate dynamic options based on available tags -->
                             <option v-for="tag in all_tags" :value="tag.id">{{tag.name}}</option>
                         </select>
                     </div>
@@ -137,7 +153,7 @@
                 </div>
             </div>
             
-            <!--show_detail-->
+            <!-- Show_detail -->
             <div class="field" v-if="mode=='detail'">
                 <h1 class="title is-1">{{task_name}}</h1>
                 <p class="subtitle is-6"> <b>Tag:</b> {{tag_name_from_id(form_sub_tag)}}</p>
@@ -151,22 +167,25 @@
                 </a>
             </div>
 
-            <!--main page-->
+            <!-- Main page -->
             <div v-if="mode== 'table'">
                 <!--uncompleted_task_table-->
                 <div class="field">
                     <h2 class="is-size-2">Current Tasks</h2>
                     <br>
+                    <!-- Button to switch to the add mode and get users -->
                     <a class="button is-success" @click="switch_mode(2), get_users()">
                         <span class="icon"><i class="fa fa-plus"></i></span>
                         <span>Add</span>
                     </a>
+                    <!-- Button to switch to create a new tag mode -->
                     <a class="button is-primary" @click="switch_mode(4)">
                         <span class="icon"><i class="fa fa-plus"></i></span>
                         <span>Create new tag</span>
                     </a>
                     <br>
                     <div class="select">
+                        <!-- Dropdown to select a tag for filtering -->
                         <select v-model="selected_tag">
                             <option disabled :value="null"><i>Select a filter</i></option>
                             <option :value="null"><i>No filter</i></option>
@@ -188,6 +207,7 @@
                             </tr>
                         </thead>
                         <tbody v-for="untask in uncompleted_tasks">
+                            <!-- Filter tasks based on the selected tag -->
                             <tr v-if="selected_tag == null || selected_tag == untask.tag">
                                 <td>{{untask.name}}</td>
                                 <td>
@@ -204,13 +224,16 @@
                                     {{untask.assigned.join(", ")}}
                                 </td>
                                 <td>
+                                    <!-- Display the tag of the task or "No Tags" if no tag is assigned -->
                                     <span class="tag" :class="tag_color_from_id(untask.tag)" v-if="tag_name_from_id(untask.tag)">{{tag_name_from_id(untask.tag)}}</span>
                                     <span v-else>No Tags</span>
                                 </td>
                                 <td>
+                                    <!-- Button to enter edit mode for the task -->
                                     <a class="button is-warning" v-on:click="edit_mode(untask)"><span class="icon"><i class="fa fa-edit"></i></span></a>
                                 </td>
                                 <td>
+                                    <!-- Button to mark the task as complete -->
                                     <a class="button is-success" @click="completed(untask.id)"><span class="icon"><i class="fa fa-check"></i></span></a>
                                 </td>
                             </tr>
@@ -218,7 +241,7 @@
                     </table>
                 </div>
 
-                <!--completed_task_table-->
+                <!-- Completed_task_table -->
                 <div class="field" v-if="completed_tasks.length != 0">
                     <h2 class="is-size-2">Completed Tasks</h2>
                     <br>
@@ -234,6 +257,7 @@
                             </tr>
                         </thead>
                         <tbody v-for="task in completed_tasks">
+                            <!-- Filter tasks based on the selected tag -->
                             <tr v-if="selected_tag == null || selected_tag == task.tag">
                                 <td>{{task.name}}</td>
                                 <td>
@@ -244,13 +268,16 @@
                                     {{task.assigned.join(", ")}}
                                 </td>
                                 <td>
+                                    <!-- Display the tag of the task or "No Tags" if no tag is assigned -->
                                     <span class="tag" :class="tag_color_from_id(task.tag)" v-if="tag_name_from_id(task.tag)">{{tag_name_from_id(task.tag)}}</span>
                                     <span v-else>No Tags</span>
                                 </td>
                                 <td>
+                                    <!-- Button to enter edit mode for the task -->
                                     <a class="button is-warning" v-on:click="edit_mode(task)"><span class="icon"><i class="fa fa-edit"></i></span></a>
                                 </td>
                                 <td>
+                                    <!-- Button to restore the task to uncompleted status -->
                                     <a class="button is-primary" @click="completed(task.id)"><span class="icon"><i class="fa fa-plus"></i></span></a>
                                 </td>
                             </tr>
@@ -261,7 +288,7 @@
         </div>
 
         <div class="column">
-            <!--Blank-->
+            <!-- Blank -->
         </div>
     </div>    
 </div>

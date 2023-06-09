@@ -211,9 +211,12 @@ def get_assigned_users(task_id):
     # Retrieve the names of the assignees
     for user in assignees_ids:
         if 'asignee' in user:
+            # Retrieve the first name of the assignee from the auth_user table
             if db.auth_user[user['asignee']].first_name == get_user_firstname():
+                # If the assignee is the current user, add "You" to the list
                 assignees_names.append("You")
             else:
+                # Add the first name of the assignee to the list
                 assignees_names.append(db.auth_user[user['asignee']].first_name)
 
     return assignees_names
