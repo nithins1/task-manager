@@ -47,7 +47,6 @@ let init = (app) => {
         });
         return selected;
     };
-
     // Get selected users from the past_selected list.
     app.get_selected_past_users = function(){
         let selected = [];
@@ -241,7 +240,7 @@ let init = (app) => {
             return 'is-white'
         }
     }
-
+  
     // Mark a task as completed.
     app.completed = function(task_id){
         axios.post(complete_task_url, {task_id: task_id}).then(function(respsonse){

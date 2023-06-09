@@ -32,11 +32,10 @@ def index():
 def get_tasks():
     # Retrieve the user ID of the current user
     user_id = get_user_id()
-
-    # Retrieve tasks assigned to the user and tasks created by the user
     user_tasks = db((db.tasks.user_id == user_id)).select(db.tasks.ALL).as_list()
+    
+    # Retrieve tasks assigned to the user
     assigned_tasks = db((db.assigned.asignee == user_id) & (db.tasks.id == db.assigned.task_id)).select(db.tasks.ALL).as_list()
-
     # Separate tasks into completed and uncompleted lists
     uncompleted_tasks = [t for t in user_tasks if t['completed'] == False] + [t for t in assigned_tasks if t['completed'] == False]
     completed_tasks = [t for t in user_tasks if t['completed'] == True] + [t for t in assigned_tasks if t['completed'] == True]
@@ -55,6 +54,12 @@ def get_tasks():
 @action("get_tags", method="GET")
 @action.uses(db, auth.user)
 def get_tags():
+    """
+    API for retrieving a list of tags.
+
+    Returns:
+        dict: A dictionary containing the tags.
+    """
     user_id = get_user_id()
 
     # Retrieve tags associated with the user
@@ -72,15 +77,16 @@ def add():
     deadline_str = request.json.get('deadline')
     assigned = request.json.get('assigned')
     tag_id = request.json.get('tag')
-
+    
     # Check if the provided tag ID is valid
     if tag_id and not db.tags[tag_id]:
         print("recieved no valid tag id")
         tag_id = None
 
     print("deadline!!!!!", deadline_str)
-
+    
     # Convert deadline string to datetime
+
     if deadline_str:
         deadline = datetime.datetime.strptime(deadline_str, '%Y-%m-%dT%H:%M')
     else:
@@ -179,6 +185,12 @@ def edit():
 @action("complete_task", method="POST")
 @action.uses(db, auth.user, url_signer.verify())
 def complete_task():
+    """
+    API for changing the completed status of a task.
+
+    Returns:
+        str: A string indicating the status of the operation.
+    """
     id = request.json.get('task_id')
     t = db.tasks[id]
 
@@ -187,7 +199,7 @@ def complete_task():
     assginee_ids = [a['asignee'] for a in assginees if 'asignee' in a]
     assginee_ids.append(t.user_id)
 
-    # Only allow update to occur if row's email matches current user
+    # Only allow the update to occur if the current user is assigned to the task
     if get_user_id() in assginee_ids:
         # Toggle the 'completed' status of the task
         status = db(db.tasks.id == t.id).select()[0]

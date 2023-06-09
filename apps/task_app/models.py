@@ -1,5 +1,8 @@
 """
-This file defines the database models
+This file defines the database models.
+
+The models.py file contains the definitions of the database tables and their fields using the PyDAL library. It also includes helper functions to retrieve user information.
+
 """
 
 from pydal.validators import *
@@ -40,3 +43,18 @@ db.define_table(
 )
 
 db.commit()
+
+"""
+The models.py file defines three database tables: 'tags', 'tasks', and 'assigned'. Each table is defined using the `db.define_table()` function provided by the PyDAL library.
+
+The 'tags' table contains fields for 'name', 'user_id', and 'color'. The 'user_id' field is a reference to the 'auth_user' table, and its default value is set to the ID of the current user (retrieved using the `get_user_id()` function). The 'color' field is not specified with any validation requirements.
+
+The 'tasks' table contains fields for 'name', 'description', 'user_id', 'deadline', 'completed', and 'tag'. The 'user_id' field is a reference to the 'auth_user' table, and its default value is set to the ID of the current user. The 'deadline' field is of type 'datetime', and the 'completed' field is a boolean with a default value of False. The 'tag' field is a reference to the 'tags' table.
+
+The 'assigned' table contains fields for 'asignee' and 'task_id', both of which are references to other tables.
+
+The helper functions 'get_user_id()' and 'get_user_firstname()' are defined to retrieve the ID and first name of the current user, respectively. These functions rely on the 'auth' object provided by the 'common' module.
+
+Finally, the 'db.commit()' statement is used to ensure that the defined tables are committed to the database.
+
+"""
