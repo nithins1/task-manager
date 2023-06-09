@@ -28,16 +28,18 @@ let init = (app) => {
         display_asign:""
     };
 
+    // Function to add an _idx field to each element of the array.
     app.enumerate = (a) => {
-        // This adds an _idx field to each element of the array.
         let k = 0;
+        // Use the map function to iterate over the array and add an _idx field to each element.
         a.map((e) => {e._idx = k++;});
         return a;
     };
 
-    // Get the selected users from the user list
+    // Get selected users from the users list.
     app.get_selected_users = function(){
         let selected = [];
+        // Iterate over the users list and check if the user is selected.
         app.vue.users.forEach(user => {
             if (user.selected) {
                 selected.push(user.user.id);
@@ -45,10 +47,10 @@ let init = (app) => {
         });
         return selected;
     };
-    
-    // Get the selected users from the past user list
+    // Get selected users from the past_selected list.
     app.get_selected_past_users = function(){
         let selected = [];
+        // Iterate over the past_selected list and check if the user is selected.
         app.vue.past_selected.forEach(user => {
             if (user.selected) {
                 selected.push(user.user.id);
@@ -57,7 +59,7 @@ let init = (app) => {
         return selected;
     };
 
-
+    // Switch the app mode based on the given value.
     app.switch_mode = function(m){
         switch(m){
             case 1:
@@ -80,7 +82,7 @@ let init = (app) => {
         }
     };
 
-    // Show the details of a task
+    // Show task details in the detail mode.
     app.show_detail = function(task){
         app.vue.selected_task = task.id;
         app.vue.task_name = task.name;
@@ -91,7 +93,7 @@ let init = (app) => {
         app.switch_mode(5)
     };
 
-    // Switch to edit mode for a task
+    // Switch to edit mode for a specific task.
     app.edit_mode = function(task){
         app.vue.selected_task = task.id;
         app.vue.task_name = task.name;
@@ -102,9 +104,10 @@ let init = (app) => {
         app.switch_mode(3)
     };
 
-    // Update the task or tag
+    // Update the task or tag based on the current mode.
     app.update = function(){
         if(app.vue.mode == "edit"){
+            // If the mode is "edit", update the task.
             axios.post(edit_url, ({
                 task_id: app.vue.selected_task, 
                 name: app.vue.task_name, 
@@ -114,19 +117,21 @@ let init = (app) => {
                 tag:app.vue.form_sub_tag
             })).then(function(respsonse){
                 console.log(respsonse);
+                // Reset the form fields and selected users.
                 app.vue.selected_task = 0;
                 app.vue.task_name = "";
                 app.vue.task_description = "";
                 app.vue.task_deadline = "";
                 app.vue.users = [];
-
+                // Switch back to the default mode and refresh the tasks.
                 app.switch_mode(1);
                 app.get_tasks();
             });
         }
 
         if(app.vue.mode == "add"){
-            //Block the error using warning
+            // If the mode is "add", add a new task.
+            // Block the error using warning if required fields are not filled.
             if(app.vue.task_name ===""){
                 app.vue.warning = "Type your task name";
                 return;
@@ -150,19 +155,21 @@ let init = (app) => {
                 tag:app.vue.form_sub_tag
             })).then(function(respsonse){
                 console.log(respsonse);
+                // Reset the form fields and selected users.
                 app.vue.selected_task = 0;
                 app.vue.task_name = "";
                 app.vue.task_description = "";
                 app.vue.task_deadline = "";
                 app.vue.users = [];
-
+                // Switch back to the default mode and refresh the tasks.
                 app.switch_mode(1);
                 app.get_tasks();
             });
         }
 
         if(app.vue.mode == "addtag"){
-            //Block the error using warning
+            // If the mode is "addtag", add a new tag.
+            // Block the error using warning if the tag name is not filled.
             if(app.vue.tag_name ===""){
                 app.vue.warning = "Type your tag name";
                 return;
@@ -174,20 +181,23 @@ let init = (app) => {
                 name: app.vue.tag_name,
                 color: app.vue.form_tag_color})).then(function(response){
                     console.log(response);
+                    // Reset the tag name field.
                     app.vue.tag_name = "";
-
+                    // Switch back to the default mode and refresh the tags.
                     app.switch_mode(1);
                     app.get_tags();
                 });
         }
     };
 
-    // Get all the tasks
+    // Get the list of tasks from the server.
     app.get_tasks = function(){
         axios.get(get_tasks_url).then(function(respsonse){
+            // Update the uncompleted_tasks and completed_tasks arrays with the retrieved data.
             app.vue.uncompleted_tasks = app.enumerate(respsonse.data.uncompleted);
             app.vue.completed_tasks = app.enumerate(respsonse.data.completed);
 
+            // Iterate over the uncompleted_tasks array and update the timeleft field using Sugar.Date library.
             app.vue.uncompleted_tasks.forEach(task => {
                 console.log(task.timeleft);
                 task.timeleft = Sugar.Date(task.timeleft).relative().raw;
@@ -195,18 +205,20 @@ let init = (app) => {
         });
     };
 
-    // Get all the tags
+    // Get the list of tags from the server.
     app.get_tags = function(){
         axios.get(get_tags_url).then(function(response){
+            // Update the all_tags array with the retrieved tags data.
             app.vue.all_tags = app.enumerate(response.data.tags);
             console.log("retrieved tags:");
+            // Log each tag in the all_tags array.
             app.vue.all_tags.forEach(function(e){
                 console.log(e);
             });
         });
     };
 
-    // Get tag name from its ID
+    // Get the tag name based on its ID.
     app.tag_name_from_id = function (id){
         let tag_obj = app.vue.all_tags.find(obj => {return obj.id == id});
         if (tag_obj) {
@@ -216,26 +228,29 @@ let init = (app) => {
         }
     }
 
-    // Get tag color from its ID
+    // Get the tag color based on its ID.
     app.tag_color_from_id = function (id){
         let tag_obj = app.vue.all_tags.find(obj => {return obj.id == id});
         if (tag_obj) {
+            // Define a color converter object to map tag colors to corresponding CSS classes.
             let converter = {white: 'is-white', black: 'is-black', red: 'is-danger', green: 'is-success', blue: 'is-link', yellow: 'is-warning', cyan: 'is-info'}
+            // Return the corresponding CSS class based on the tag color.
             return converter[tag_obj.color] || 'is-white'
         } else {
             return 'is-white'
         }
     }
-    
-    // Mark a task as completed
+  
+    // Mark a task as completed.
     app.completed = function(task_id){
         axios.post(complete_task_url, {task_id: task_id}).then(function(respsonse){
             console.log(respsonse);
+            // Refresh the list of tasks after marking a task as completed.
             app.get_tasks();
         });
     }
 
-    // Get all the users
+    // Get the list of users from the server.
     app.get_users = function(selected_users=[]) {
         let users = [];
         axios.get(get_users_url).then(function(r) {
@@ -259,9 +274,11 @@ let init = (app) => {
         });
     };
 
+    // Toggle the selection of a user.
     app.assign_user = function(idx) {
         app.vue.users[idx].selected = !app.vue.users[idx].selected;
     };
+
     // This contains all the methods.
     app.methods = {
         get_tasks: app.get_tasks,

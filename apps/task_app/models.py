@@ -9,30 +9,11 @@ from pydal.validators import *
 
 from .common import Field, auth, db
 
-### Define your table below
-#
-# db.define_table('thing', Field('name'))
-#
-## always commit your models to avoid problems later
-#
-# db.commit()
-#
-
 def get_user_id():
-    """
-    Retrieves the ID of the current user.
-
-    Returns:
-        int: The ID of the current user, or None if no user is logged in.
-    """
+    # Retrieve the ID of the current user if available
     return auth.current_user.get('id') if auth.current_user else None
 def get_user_firstname():
-    """
-    Retrieves the first name of the current user.
-
-    Returns:
-        str: The first name of the current user, or None if no user is logged in.
-    """
+    # Retrieve the first name of the current user if available
     return auth.current_user.get('first_name') if auth.current_user else None
 
 # Define the 'tags' table
