@@ -176,7 +176,10 @@
                         <tbody v-for="untask in uncompleted_tasks">
                             <tr v-if="selected_tag == null || selected_tag == untask.tag">
                                 <td>{{untask.name}}</td>
-                                <td>{{untask.description}}</td>
+                                <td>
+                                    {{untask.description.slice(0,20)}}
+                                    <a v-if="untask.description.length > 20">... (detail)</a>
+                                </td>
                                 <td class="has-text-danger" v-if="untask.overdue">
                                     {{untask.timeleft}}
                                 </td>
@@ -219,7 +222,7 @@
                         <tbody v-for="task in completed_tasks">
                             <tr v-if="selected_tag == null || selected_tag == task.tag">
                                 <td>{{task.name}}</td>
-                                <td>{{task.description}}</td>
+                                <td>{{task.description.slice(0,20)}}</td>
                                 <td>
                                     {{task.assigned.join(", ")}}
                                 </td>

@@ -68,6 +68,9 @@ let init = (app) => {
             case 4:
                 app.vue.mode = "addtag"
                 break;
+            case 5:
+                app.vue.mode = "detail"
+                break;
             default:
                 app.vue.mode = "table"
         }
